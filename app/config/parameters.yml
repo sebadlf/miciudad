@@ -1,0 +1,14 @@
+parameters:
+    database_driver: pdo_mysql
+    database_host: localhost
+    database_port: null
+    database_name: miciudad
+    database_user: root
+    database_password: root
+    mailer_transport: smtp
+    mailer_host: localhost
+    mailer_user: null
+    mailer_password: null
+    locale: en
+    secret: f45bd8a6659c8ad4e97a86dbd473fdb16f2b8a44
+    database_path: null
