@@ -71,11 +71,16 @@ class CampoExtendido
     private $estiloCss;
 
     /**
-     * @var string $campoExtendidoOpciones
+     * @var ArrayCollection $campoExtendidoOpciones
      *
      * @ORM\OneToMany(targetEntity="MiCiudad\ModeloBundle\Entity\CampoExtendidoOpcion", mappedBy="campoExtendido")
      */
     private $campoExtendidoOpciones;
+    
+   	public function __construct(){
+   		$this->campoExtendidoOpciones = new ArrayCollection();
+   	}
+   
     
     /**
      * Get id

@@ -14,6 +14,7 @@ use MiCiudad\ModeloBundle\Form\DispositivoType;
 use Symfony\Component\Form\Form;
 
 use MiCiudad\ApiBundle\Entity\Comentario;
+use MiCiudad\ModeloBundle\Entity\TipoSolicitud;
 
 use JMS\SerializerBundle\Annotation\Type;
 
@@ -53,9 +54,6 @@ class DefaultController extends Controller
 							        )
     	)  ->add('descripcion', 'text', array("required" => true))
     		->getForm();
-    	
-    	print_r($form);
-    	
     	
     	if ($request->getMethod() == 'PUT'){
     		$form->bind(array());
@@ -157,12 +155,88 @@ class DefaultController extends Controller
     public function tipoSolicitudAction()
     {
         $em = $this->getDoctrine()->getManager();
-
-        $entities = $em->getRepository('ModeloBundle:TipoSolicitud')->findAll();
-
+        
+        $request = $this->getRequest();
+       
+        $tiposSolicitudes = $em->getRepository('ModeloBundle:TipoSolicitud')->findBy(array("tipoSolicitudPadre" => null));
+        
+        $i = 0;
+        $result = array();
+        foreach ($tiposSolicitudes as $tipoSolicitud) {
+        	$result[$i] = $this->generarArrayRecursivo($tipoSolicitud);
+        }
+        
         $serializer = $this->container->get('serializer');
-        $report = $serializer->serialize($entities, 'json');
+        $report = $serializer->serialize($result, 'json');
                 
         return new Response($report);	
     }
+    
+   	private function generarArrayRecursivo(TipoSolicitud $tipoSolicitud){
+   		
+   		$tipoSolicitudHijas = $tipoSolicitud->getTipoSolicitudHijas();
+
+   		$result["id"] = $tipoSolicitud->getId();
+   		$result["titulo"] = $tipoSolicitud->getTitulo();
+   		$result["descripcion"] = $tipoSolicitud->getDescripcion();
+   		$result["icono"] = $this->getRequest()->getHost() . "/uploads/cache/tiposolicitud/" . $tipoSolicitud->getIcono();
+   		if (count($tipoSolicitudHijas) == 0){
+			$result["datos_extendidos"] = $this->generarDatosExtendidos($tipoSolicitud);  			
+   		} else {
+   			$i = 0;
+   			foreach ($tipoSolicitudHijas as $tipoSolicitudHija) {
+				$result["tipo_solicitud_hijas"][$i] = $this->generarArrayRecursivo($tipoSolicitudHija);
+   				$i++;
+   			} 
+   		}
+   		
+   		return $result;
+   	}
+   	
+   	private function generarDatosExtendidos(TipoSolicitud $tipoSolicitud){
+   		
+   		$resultado = array();
+
+   		$i = 0;
+   		
+   		while($tipoSolicitud != null){
+   		
+   			$formulario = $tipoSolicitud->getFormulario();
+   			
+   			if ($formulario != null){
+   		
+				foreach ($formulario->getCamposExtendidos() as $datoExtendido) {
+					
+					$resultado[$i]["id"] = $datoExtendido->getId();
+					$resultado[$i]["descripcion"] = $datoExtendido->getDescripcion();
+					$resultado[$i]["tipoControl"] = $datoExtendido->getTipoControl()->getDescripcion();
+					$resultado[$i]["tipoDato"] = $datoExtendido->getTipoDato()->getDescripcion();
+					
+					if ($datoExtendido->getTipoControl()->getDescripcion() == "Radio"){
+
+						$j = 0;
+						foreach ($datoExtendido->getCampoExtendidoOpciones() as $opcion) {
+							$opciones[$j]["id"] = $opcion->getId();
+							$opciones[$j]["descripcion"] = $opcion->getDescripcion();
+							
+							$j++;
+						}
+								
+					}
+					else{
+						$opciones = array();
+					}
+					
+					$resultado[$i]["opciones"] = $opciones;
+					
+					$i++;
+				}   				
+   			}
+   			
+   			$tipoSolicitud = $tipoSolicitud->getTipoSolicitudPadre();
+   		} 
+   		
+   		return $resultado;
+   		
+   	}
 }

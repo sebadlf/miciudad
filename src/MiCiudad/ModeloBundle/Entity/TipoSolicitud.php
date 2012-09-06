@@ -22,9 +22,16 @@ class TipoSolicitud
     private $id;
 
     /**
+     * @var string $titulo
+     *
+     * @ORM\Column(name="titulo", type="string", length=255)
+     */
+    private $titulo;
+    
+    /**
      * @var string $descripcion
      *
-     * @ORM\Column(name="descripcion", type="string", length=255)
+     * @ORM\Column(name="descripcion", type="string", length=1000)
      */
     private $descripcion;
 
@@ -81,6 +88,29 @@ class TipoSolicitud
         return $this->id;
     }
 
+    /**
+     * Set titulo
+     *
+     * @param string $titulo
+     * @return TipoSolicitud
+     */
+    public function setTitulo($titulo)
+    {
+    	$this->titulo = $titulo;
+    
+    	return $this;
+    }
+    
+    /**
+     * Get titulo
+     *
+     * @return string
+     */
+    public function getTitulo()
+    {
+    	return $this->titulo;
+    }
+    
     /**
      * Set descripcion
      *
@@ -143,7 +173,7 @@ class TipoSolicitud
     /**
      * Get formulario
      *
-     * @return Formulario
+     * @return \MiCiudad\ModeloBundle\Entity\Formulario
      */
     public function getFormulario()
     {
