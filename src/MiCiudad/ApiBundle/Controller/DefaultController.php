@@ -2,6 +2,8 @@
 
 namespace MiCiudad\ApiBundle\Controller;
 
+use Imagine\Gd\Image;
+
 use MiCiudad\ModeloBundle\Entity\Dispositivo;
 
 use Symfony\Component\Validator\Constraints\Length;
@@ -26,8 +28,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-
-use Imagine\Gd\Image;
 
 /*
  * @Type("Rest")
@@ -176,17 +176,8 @@ class DefaultController extends Controller
     
    	private function generarArrayRecursivo(TipoSolicitud $tipoSolicitud){
 
-   		/*
-$imagine = new \Imagine\Gd\Imagine();
+		//$i = new Image();
 
-$size    = new Imagine\Image\Box(40, 40);
-
-$mode    = Imagine\Image\ImageInterface::THUMBNAIL_INSET;
-
-$imagine->open('/path/to/large_image.jpg')
-    ->thumbnail($size, $mode)
-    ->save('/path/to/thumbnail.png');
-   		*/
    		$tipoSolicitudHijas = $tipoSolicitud->getTipoSolicitudHijas();
 
    		$result["id"] = $tipoSolicitud->getId();
@@ -194,7 +185,8 @@ $imagine->open('/path/to/large_image.jpg')
    		$result["descripcion"] = $tipoSolicitud->getDescripcion();
    		$result["icono"] = "http://" . $this->getRequest()->getHost() . "/uploads/cache/tiposolicitud/" . $tipoSolicitud->getIcono();
    		if (count($tipoSolicitudHijas) == 0){
-			$result["datos_extendidos"] = $this->generarDatosExtendidos($tipoSolicitud);  			
+			$result["datos_extendidos"] = $this->generarDatosExtendidos($tipoSolicitud);
+			$result["tipo_solicitud_hijas"] = array();
    		} else {
    			$i = 0;
    			foreach ($tipoSolicitudHijas as $tipoSolicitudHija) {
