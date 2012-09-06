@@ -150,7 +150,7 @@ class DefaultController extends Controller
     /**
      * @Route("/tiposolicitud")
      * @Template("ModeloBundle:Default:index.html.twig")
-     * @Method("PUT")
+     * @Method("GET")
      */
     public function tipoSolicitudAction()
     {
