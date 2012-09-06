@@ -28,6 +28,12 @@ class Formulario
      */
     private $descripcion;
 
+    /**
+     * @var \MiCiudad\ModeloBundle\Entity\CampoExtendido
+     *
+     * @ORM\OneToMany(targetEntity="CampoExtendido", mappedBy="formulario")
+     */
+    protected $camposExtendidos;    
 
     /**
      * Get id
@@ -61,4 +67,28 @@ class Formulario
     {
         return $this->descripcion;
     }
+    
+    /**
+     * Set camposExtendidos
+     *
+     * @param string $camposExtendidos
+     * @return Formulario
+     */
+    public function setCamposExtendidos($camposExtendidos)
+    {
+    	$this->camposExtendidos = $camposExtendidos;
+    
+    	return $this;
+    }
+    
+    /**
+     * Get camposExtendidos
+     *
+     * @return array
+     */
+    public function getCamposExtendidos()
+    {
+    	return $this->camposExtendidos;
+    }
+    
 }

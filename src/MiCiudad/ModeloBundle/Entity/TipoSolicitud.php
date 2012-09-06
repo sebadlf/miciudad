@@ -38,10 +38,17 @@ class TipoSolicitud
     /**
      * @var string $tipoSolicitudPadre
      *
-     * @ORM\ManyToOne(targetEntity="MiCiudad\ModeloBundle\Entity\TipoSolicitud")
+     * @ORM\ManyToOne(targetEntity="MiCiudad\ModeloBundle\Entity\TipoSolicitud", inversedBy="tipoSolicitudHijas")
      */
     private $tipoSolicitudPadre;
 
+    /**
+     * @var string $tipoSolicitudHijas
+     *
+     * @ORM\OneToMany(targetEntity="MiCiudad\ModeloBundle\Entity\TipoSolicitud", mappedBy="tipoSolicitudPadre")
+     */
+    private $tipoSolicitudHijas;
+        
     /**
      * @var string $formulario
      *
@@ -63,7 +70,6 @@ class TipoSolicitud
      * @ORM\ManyToOne(targetEntity="MiCiudad\ModeloBundle\Entity\Mapa")
      */
     private $mapa;
-
 
     /**
      * Get id
@@ -166,6 +172,30 @@ class TipoSolicitud
     {
         return $this->tipoSolicitudPadre;
     }
+    
+    /**
+     * Set tipoSolicitudHijas
+     *
+     * @param string $tipoSolicitudHijas
+     * @return TipoSolicitud
+     */
+    public function setTipoSolicitudHijas($tipoSolicitudHijas)
+    {
+    	$this->tipoSolicitudHijas = $tipoSolicitudHijas;
+    
+    	return $this;
+    }
+    
+    /**
+     * Get tipoSolicitudHijas
+     *
+     * @return array
+     */
+    public function getTipoSolicitudHijas()
+    {
+    	return $this->tipoSolicitudHijas;
+    }    
+    
 
     /**
      * Set area
