@@ -70,7 +70,13 @@ class CampoExtendido
      */
     private $estiloCss;
 
-
+    /**
+     * @var string $campoExtendidoOpciones
+     *
+     * @ORM\OneToMany(targetEntity="MiCiudad\ModeloBundle\Entity\CampoExtendidoOpcion", mappedBy="campoExtendido")
+     */
+    private $campoExtendidoOpciones;
+    
     /**
      * Get id
      *
@@ -241,4 +247,28 @@ class CampoExtendido
     {
         return $this->estiloCss;
     }
+    
+    /**
+     * Set campoExtendidoOpciones
+     *
+     * @param string $campoExtendidoOpciones
+     * @return CampoExtendido
+     */
+    public function setCampoExtendidoOpciones($campoExtendidoOpciones)
+    {
+    	$this->campoExtendidoOpciones = $campoExtendidoOpciones;
+    
+    	return $this;
+    }
+    
+    /**
+     * Get campoExtendidoOpciones
+     *
+     * @return array
+     */
+    public function getCampoExtendidoOpciones()
+    {
+    	return $this->campoExtendidoOpciones;
+    }
+    
 }
