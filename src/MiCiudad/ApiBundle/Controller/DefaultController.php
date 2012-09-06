@@ -27,6 +27,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 
+use Imagine\Gd\Image;
+
 /*
  * @Type("Rest")
  * 
@@ -173,13 +175,24 @@ class DefaultController extends Controller
     }
     
    	private function generarArrayRecursivo(TipoSolicitud $tipoSolicitud){
-   		
+
+   		/*
+$imagine = new \Imagine\Gd\Imagine();
+
+$size    = new Imagine\Image\Box(40, 40);
+
+$mode    = Imagine\Image\ImageInterface::THUMBNAIL_INSET;
+
+$imagine->open('/path/to/large_image.jpg')
+    ->thumbnail($size, $mode)
+    ->save('/path/to/thumbnail.png');
+   		*/
    		$tipoSolicitudHijas = $tipoSolicitud->getTipoSolicitudHijas();
 
    		$result["id"] = $tipoSolicitud->getId();
    		$result["titulo"] = $tipoSolicitud->getTitulo();
    		$result["descripcion"] = $tipoSolicitud->getDescripcion();
-   		$result["icono"] = $this->getRequest()->getHost() . "/uploads/cache/tiposolicitud/" . $tipoSolicitud->getIcono();
+   		$result["icono"] = "http://" . $this->getRequest()->getHost() . "/uploads/cache/tiposolicitud/" . $tipoSolicitud->getIcono();
    		if (count($tipoSolicitudHijas) == 0){
 			$result["datos_extendidos"] = $this->generarDatosExtendidos($tipoSolicitud);  			
    		} else {
