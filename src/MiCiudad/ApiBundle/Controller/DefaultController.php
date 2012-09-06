@@ -148,4 +148,21 @@ class DefaultController extends Controller
     	
     	return $return;
     }
+    
+    /**
+     * @Route("/tiposolicitud")
+     * @Template("ModeloBundle:Default:index.html.twig")
+     * @Method("PUT")
+     */
+    public function tipoSolicitudAction()
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $entities = $em->getRepository('ModeloBundle:TipoSolicitud')->findAll();
+
+        $serializer = $this->container->get('serializer');
+        $report = $serializer->serialize($entities, 'json');
+                
+        return new Response($report);	
+    }
 }

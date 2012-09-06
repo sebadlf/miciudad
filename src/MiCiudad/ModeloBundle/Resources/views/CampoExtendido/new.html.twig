@@ -1,0 +1,16 @@
+<h1>CampoExtendido creation</h1>
+
+<form action="{{ path('campoextendido_create') }}" method="post" {{ form_enctype(form) }}>
+    {{ form_widget(form) }}
+    <p>
+        <button type="submit">Create</button>
+    </p>
+</form>
+
+<ul class="record_actions">
+    <li>
+        <a href="{{ path('campoextendido') }}">
+            Back to the list
+        </a>
+    </li>
+</ul>

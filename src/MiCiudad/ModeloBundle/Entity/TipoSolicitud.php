@@ -242,4 +242,8 @@ class TipoSolicitud
     {
         return $this->mapa;
     }
+    
+    public function __ToString(){
+    	return $this->getDescripcion();
+    }
 }

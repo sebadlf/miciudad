@@ -91,4 +91,8 @@ class Formulario
     	return $this->camposExtendidos;
     }
     
+    public function __ToString(){
+    	return $this->getDescripcion();
+    }
+    
 }

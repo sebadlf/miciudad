@@ -61,4 +61,8 @@ class TipoControl
     {
         return $this->descripcion;
     }
+    
+    public function __ToString(){
+    	return $this->getDescripcion();
+    }
 }

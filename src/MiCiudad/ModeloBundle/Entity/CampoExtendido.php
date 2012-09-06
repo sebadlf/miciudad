@@ -126,11 +126,11 @@ class CampoExtendido
     /**
      * Get formulario
      *
-     * @return Formulario
+     * @return string
      */
     public function getFormulario()
     {
-    	return $this->$formulario;
+    	return $this->formulario;
     }    
     
     /**
