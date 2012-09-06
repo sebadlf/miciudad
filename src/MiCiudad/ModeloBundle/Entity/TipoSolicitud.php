@@ -38,21 +38,29 @@ class TipoSolicitud
     /**
      * @var string $tipoSolicitudPadre
      *
-     * @ORM\Column(name="tipoSolicitudPadre", type="string", length=255)
+     * @ORM\ManyToOne(targetEntity="MiCiudad\ModeloBundle\Entity\TipoSolicitud")
      */
     private $tipoSolicitudPadre;
 
     /**
+     * @var string $formulario
+     *
+     * @ORM\ManyToOne(targetEntity="MiCiudad\ModeloBundle\Entity\Formulario")
+     */
+    private $formulario;
+    
+    
+    /**
      * @var string $area
      *
-     * @ORM\Column(name="area", type="string", length=255)
+     * @ORM\ManyToOne(targetEntity="MiCiudad\ModeloBundle\Entity\Area")
      */
     private $area;
 
     /**
      * @var string $mapa
      *
-     * @ORM\Column(name="mapa", type="string", length=255)
+     * @ORM\ManyToOne(targetEntity="MiCiudad\ModeloBundle\Entity\Mapa")
      */
     private $mapa;
 
@@ -112,6 +120,29 @@ class TipoSolicitud
     {
         return $this->icono;
     }
+    
+    /**
+     * Set formulario
+     *
+     * @param string $formulario
+     * @return TipoSolicitud
+     */
+    public function setFormulario($formulario)
+    {
+    	$this->formulario = $formulario;
+    
+    	return $this;
+    }
+    
+    /**
+     * Get formulario
+     *
+     * @return Formulario
+     */
+    public function getFormulario()
+    {
+    	return $this->formulario;
+    }    
 
     /**
      * Set tipoSolicitudPadre

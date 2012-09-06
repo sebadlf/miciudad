@@ -29,16 +29,23 @@ class CampoExtendido
     private $descripcion;
 
     /**
+     * @var string $formulario
+     *
+     * @ORM\ManyToOne(targetEntity="MiCiudad\ModeloBundle\Entity\Formulario")
+     */
+    private $formulario;
+        
+    /**
      * @var string $tipoDato
      *
-     * @ORM\Column(name="tipoDato", type="string", length=255)
+     * @ORM\ManyToOne(targetEntity="MiCiudad\ModeloBundle\Entity\TipoDato") 
      */
     private $tipoDato;
 
     /**
      * @var string $tipoControl
      *
-     * @ORM\Column(name="tipoControl", type="string", length=255)
+     * @ORM\ManyToOne(targetEntity="MiCiudad\ModeloBundle\Entity\TipoControl")
      */
     private $tipoControl;
 
@@ -97,6 +104,29 @@ class CampoExtendido
         return $this->descripcion;
     }
 
+    /**
+     * Set formulario
+     *
+     * @param string $formulario
+     * @return CampoExtendido
+     */
+    public function setFormulario($formulario)
+    {
+    	$this->formulario = $formulario;
+    
+    	return $this;
+    }
+    
+    /**
+     * Get formulario
+     *
+     * @return Formulario
+     */
+    public function getFormulario()
+    {
+    	return $this->$formulario;
+    }    
+    
     /**
      * Set tipoDato
      *
