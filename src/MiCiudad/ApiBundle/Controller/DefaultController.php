@@ -2,7 +2,7 @@
 
 namespace MiCiudad\ApiBundle\Controller;
 
-use Imagine\Gd\Image;
+use Imagine\Gd\Imagine;
 
 use MiCiudad\ModeloBundle\Entity\Dispositivo;
 
@@ -162,10 +162,15 @@ class DefaultController extends Controller
        
         $tiposSolicitudes = $em->getRepository('ModeloBundle:TipoSolicitud')->findBy(array("tipoSolicitudPadre" => null));
         
+        $anchoIcono = $request->query->get("anchoIcono", 0);
+        $altoIcono = $request->query->get("altoIcono", 0);
+        $largoTitulo = $request->query->get("largoTitulo", 0);
+        $largoDescripcion = $request->query->get("largoDescripcion", 0);
+        
         $i = 0;
         $result = array();
         foreach ($tiposSolicitudes as $tipoSolicitud) {
-        	$result[$i] = $this->generarArrayRecursivo($tipoSolicitud);
+        	$result[$i] = $this->generarArrayRecursivo($tipoSolicitud, $anchoIcono, $altoIcono, $largoTitulo, $largoDescripcion);
         }
         
         $serializer = $this->container->get('serializer');
@@ -174,28 +179,82 @@ class DefaultController extends Controller
         return new Response($report);	
     }
     
-   	private function generarArrayRecursivo(TipoSolicitud $tipoSolicitud){
-
-		//$i = new Image();
-
+   	private function generarArrayRecursivo(TipoSolicitud $tipoSolicitud, $anchoIcono, $altoIcono, $largoTitulo, $largoDescripcion){
+		
    		$tipoSolicitudHijas = $tipoSolicitud->getTipoSolicitudHijas();
 
    		$result["id"] = $tipoSolicitud->getId();
-   		$result["titulo"] = $tipoSolicitud->getTitulo();
-   		$result["descripcion"] = $tipoSolicitud->getDescripcion();
-   		$result["icono"] = "http://" . $this->getRequest()->getHost() . "/uploads/cache/tiposolicitud/" . $tipoSolicitud->getIcono();
+   		$result["titulo"] = ($largoTitulo > 0) ? substr($tipoSolicitud->getTitulo(), $largoTitulo) : $tipoSolicitud->getTitulo();
+   		$result["descripcion"] = ($largoDescripcion > 0) ? substr($tipoSolicitud->getDescripcion(), $largoDescripcion) : $tipoSolicitud->getDescripcion();
+   		$result["icono"] = $this->generarThumbnailTipoSolicitud($tipoSolicitud, $anchoIcono, $altoIcono);
    		if (count($tipoSolicitudHijas) == 0){
 			$result["datos_extendidos"] = $this->generarDatosExtendidos($tipoSolicitud);
 			$result["tipo_solicitud_hijas"] = array();
    		} else {
    			$i = 0;
    			foreach ($tipoSolicitudHijas as $tipoSolicitudHija) {
-				$result["tipo_solicitud_hijas"][$i] = $this->generarArrayRecursivo($tipoSolicitudHija);
+				$result["tipo_solicitud_hijas"][$i] = $this->generarArrayRecursivo($tipoSolicitudHija, $anchoIcono, $altoIcono, $largoTitulo, $largoDescripcion);
    				$i++;
    			} 
    		}
    		
    		return $result;
+   	}
+   	
+   	private function generarThumbnailTipoSolicitud(TipoSolicitud $tipoSolicitud, $ancho, $alto){
+   		
+   		$id = $tipoSolicitud->getId();
+   		$archivo = $tipoSolicitud->getIcono();
+
+   		$pathArchivo = $this->container->getParameter('directorio.uploads');
+   		$pathArchivo = $pathArchivo . $archivo;
+   		
+   		$archivoCache = substr("00000000" . $id, -8) . "_" . substr("00000000" . $ancho, -8) . "_" . substr("00000000" . $alto, -8) . ".png";
+   		
+   		$pathArchivoCache = $this->container->getParameter('directorio.uploads.cache') . "tiposolicitud/" . $archivoCache;
+
+   		if (file_exists($pathArchivoCache) == false){
+   			if (file_exists($pathArchivo) == true){
+   				
+   				if (($ancho > 0) && ($alto > 0)){
+   					$imagine = new \Imagine\Gd\Imagine();
+   					$size    = new \Imagine\Image\Box($ancho, $alto);
+   					$mode    = \Imagine\Image\ImageInterface::THUMBNAIL_INSET;
+   					
+   					$imagenResultado = $imagine->create($size, new \Imagine\Image\Color('000', 100));
+   					
+   					$thumbnail = $imagine->open($pathArchivo)->thumbnail($size, $mode);
+   					
+   					$offsetX = (int)(($ancho - $thumbnail->getSize()->getWidth()) / 2);
+   					$offsetY = (int)(($alto - $thumbnail->getSize()->getHeight()) / 2);
+   					
+   					$imagenResultado->paste($thumbnail, new \Imagine\Image\Point($offsetX, $offsetY));   					
+   					
+   					$imagenResultado->save($pathArchivoCache);
+   				} else {
+   					$imagine = new \Imagine\Gd\Imagine();
+   					$imagine->open($pathArchivo)->save($pathArchivoCache);
+   				}
+   				
+   			}
+   			else
+   			{
+   				$archivoCache = null;
+   			}
+   		}
+   		
+   		$urlArchivoCache = "";
+   		if ($archivoCache != null){
+   			$request = $this->getRequest();
+   			
+   			$scheme = $request->getScheme();
+   			$host = $request->getHost();
+   			$uriArchivosCache = $this->container->getParameter('uri.uploads.cache');
+   			
+   			$urlArchivoCache = $scheme . "://" . $host . $uriArchivosCache . "tiposolicitud/" . $archivoCache;     			
+   		}
+
+   		return $urlArchivoCache;
    	}
    	
    	private function generarDatosExtendidos(TipoSolicitud $tipoSolicitud){

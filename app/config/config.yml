@@ -2,6 +2,13 @@ imports:
     - { resource: parameters.yml }
     - { resource: security.yml }
 
+parameters:
+    uri.uploads: /uploads/
+    uri.uploads.cache: /uploads/cache/
+    directorio.uploads: %kernel.root_dir%/../web/uploads/
+    directorio.uploads.cache: %kernel.root_dir%/../web/uploads/cache/
+
+
 framework:
     #esi:             ~
     #translator:      { fallback: %locale% }
