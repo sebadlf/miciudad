@@ -311,34 +311,60 @@ class DefaultController extends Controller
    	 */
    	public function tipoSolicitudUltimaActualizacionAction()
    	{
-   		$em = $this->getDoctrine()->getManager();
+   		$request = $this->getRequest();
    		
-   		$qb = $em->createQueryBuilder();
+   		$errors = null;
+   		if ($request->query->has("zona") == false){
+   			$errors = "zona es un parametro requerido";
+   		} else {
+   			$zona = $request->query->get("zona");
+   			
+   			if (preg_match("[\d]", $zona) == false || ((int)$zona < -10) || ((int)$zona > 13)){
+   				$errors = "zona debe ser un entero entre -10 y +13";
+   			}
+   		} 
    		
-   		$qb->select('ts')
-   			->from('ModeloBundle:TipoSolicitud', 'ts')
-   			->orderBy('ts.fechaUltimaActualizacion', 'DESC')
-			->setFirstResult(0)
-   			->setMaxResults(1);
-   		
-   		$query = $qb->getQuery();
+   		if ($errors == null){    		
+	   		$now = new \DateTime();
+	   		$zonaServer =($now->getTimezone()->getOffset($now) / 60 / 60);
+	   		
+	   		
+	   		$zonaDispositivo = $request->query->get("zona");
+	   		
+	   		$diferencia = $zonaServer - $zonaDispositivo;
+	   		
+	   		$em = $this->getDoctrine()->getManager();
+	   		
+	   		$qb = $em->createQueryBuilder();
+	   		
+	   		$qb->select('ts')
+	   			->from('ModeloBundle:TipoSolicitud', 'ts')
+	   			->orderBy('ts.fechaUltimaActualizacion', 'DESC')
+				->setFirstResult(0)
+	   			->setMaxResults(1);
+	   		
+	   		$query = $qb->getQuery();
+	
+	   		$tipoSolicitud = $query->getSingleResult();
+	   		
+	   		$fecha = $tipoSolicitud->getFechaUltimaActualizacion();
+	   		
+	   		$fecha->modify($diferencia . ' hours');
+	   			
+	   		$result = array (
+	   							"fecha" => $fecha->format('Y-m-d H:i:s'),
+	   							"diferencia" => $diferencia
+	   						);
+	   		
+	   		$serializer = $this->container->get('serializer');
+	   		$report = $serializer->serialize($result, 'json');
+	   		
+	   		return new Response($report);
+   		} else {
+   			$serializer = $this->container->get('serializer');
+   			$report = $serializer->serialize($errors, 'json');
 
-   		$tipoSolicitud = $query->getSingleResult();
-   		
-   		$fecha = $tipoSolicitud->getFechaUltimaActualizacion();
-   		
-   		$tipoSolicitud = $query->getSingleResult(); 
-   		
-   		$now = new \DateTime();
-	 		
-   		$result = array (
-   							"fecha" => $fecha->format('Y-m-d H:i:s'),
-   							"zona" => ($now->getTimezone()->getOffset($now) / 60 / 60)
-   						);
-   		
-   		$serializer = $this->container->get('serializer');
-   		$report = $serializer->serialize($result, 'json');
-   		
-   		return new Response($report);
+   			return new Response($report, 502);
+   		}
    	}   	
 }
