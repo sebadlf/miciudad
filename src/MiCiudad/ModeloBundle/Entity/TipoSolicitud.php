@@ -79,6 +79,13 @@ class TipoSolicitud
     private $mapa;
 
     /**
+     * @var \DateTime $fechaUltimaActualizacion
+     *
+     * @ORM\Column(name="fechaUltimaActualizacion", type="datetime")
+     */
+    private $fechaUltimaActualizacion;
+    
+    /**
      * Get id
      *
      * @return integer 
@@ -271,6 +278,29 @@ class TipoSolicitud
     public function getMapa()
     {
         return $this->mapa;
+    }
+
+    /**
+     * Set fechaUltimaActualizacion
+     *
+     * @param \DateTime $fechaUltimaActualizacion
+     * @return AAAA
+     */
+    public function setFechaUltimaActualizacion($fechaUltimaActualizacion)
+    {
+    	$this->fechaUltimaActualizacion = $fechaUltimaActualizacion;
+    
+    	return $this;
+    }
+    
+    /**
+     * Get fechaUltimaActualizacion
+     *
+     * @return \DateTime
+     */
+    public function getFechaUltimaActualizacion()
+    {
+    	return $this->fechaUltimaActualizacion;
     }
     
     public function __ToString(){

@@ -303,4 +303,42 @@ class DefaultController extends Controller
    		return $resultado;
    		
    	}
+   	
+   	/**
+   	 * @Route("/tiposolicitud/ultimaactualizacion")
+   	 * @Template("ModeloBundle:Default:index.html.twig")
+   	 * @Method("GET")
+   	 */
+   	public function tipoSolicitudUltimaActualizacionAction()
+   	{
+   		$em = $this->getDoctrine()->getManager();
+   		
+   		$qb = $em->createQueryBuilder();
+   		
+   		$qb->select('ts')
+   			->from('ModeloBundle:TipoSolicitud', 'ts')
+   			->orderBy('ts.fechaUltimaActualizacion', 'DESC')
+			->setFirstResult(0)
+   			->setMaxResults(1);
+   		
+   		$query = $qb->getQuery();
+
+   		$tipoSolicitud = $query->getSingleResult();
+   		
+   		$fecha = $tipoSolicitud->getFechaUltimaActualizacion();
+   		
+   		$tipoSolicitud = $query->getSingleResult(); 
+   		
+   		$now = new \DateTime();
+	 		
+   		$result = array (
+   							"fecha" => $fecha->format('Y-m-d H:i:s'),
+   							"zona" => ($now->getTimezone()->getOffset($now) / 60 / 60)
+   						);
+   		
+   		$serializer = $this->container->get('serializer');
+   		$report = $serializer->serialize($result, 'json');
+   		
+   		return new Response($report);
+   	}   	
 }
