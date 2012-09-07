@@ -327,11 +327,10 @@ class DefaultController extends Controller
    		if ($errors == null){    		
 	   		$now = new \DateTime();
 	   		$zonaServer =($now->getTimezone()->getOffset($now) / 60 / 60);
-	   		
-	   		
+	   			   		
 	   		$zonaDispositivo = $request->query->get("zona");
 	   		
-	   		$diferencia = $zonaServer - $zonaDispositivo;
+	   		$diferencia = $zonaDispositivo - $zonaServer;
 	   		
 	   		$em = $this->getDoctrine()->getManager();
 	   		
@@ -352,8 +351,7 @@ class DefaultController extends Controller
 	   		$fecha->modify($diferencia . ' hours');
 	   			
 	   		$result = array (
-	   							"fecha" => $fecha->format('Y-m-d H:i:s'),
-	   							"diferencia" => $diferencia
+	   							"fecha" => $fecha->format('Y-m-d H:i:s')
 	   						);
 	   		
 	   		$serializer = $this->container->get('serializer');
