@@ -184,8 +184,8 @@ class DefaultController extends Controller
    		$tipoSolicitudHijas = $tipoSolicitud->getTipoSolicitudHijas();
 
    		$result["id"] = $tipoSolicitud->getId();
-   		$result["titulo"] = ($largoTitulo > 0) ? substr($tipoSolicitud->getTitulo(), $largoTitulo) : $tipoSolicitud->getTitulo();
-   		$result["descripcion"] = ($largoDescripcion > 0) ? substr($tipoSolicitud->getDescripcion(), $largoDescripcion) : $tipoSolicitud->getDescripcion();
+   		$result["titulo"] = ($largoTitulo > 0) ? substr($tipoSolicitud->getTitulo(), 0, $largoTitulo) : $tipoSolicitud->getTitulo();
+   		$result["descripcion"] = ($largoDescripcion > 0) ? substr($tipoSolicitud->getDescripcion(), 0, $largoDescripcion) : $tipoSolicitud->getDescripcion();
    		$result["icono"] = $this->generarThumbnailTipoSolicitud($tipoSolicitud, $anchoIcono, $altoIcono);
    		if (count($tipoSolicitudHijas) == 0){
 			$result["datos_extendidos"] = $this->generarDatosExtendidos($tipoSolicitud);
