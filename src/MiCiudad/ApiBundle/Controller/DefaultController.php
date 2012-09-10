@@ -364,5 +364,82 @@ class DefaultController extends Controller
 
    			return new Response($report, 502);
    		}
-   	}   	
+   	}
+   	
+   	private function validarVacios($arrayKeys){
+   		
+   		$errors = array();
+   		
+   		foreach ($arrayKeys as $key) {
+   			if (strlen($request->request->get($key)) == 0){
+   				$errors[$key] = $key . " es un dato requerido";
+   			}
+   		}
+   		
+		return $errors;   		
+   	}
+   	
+
+   	/**
+   	 * @Route("/solicitud")
+   	 * @Template("index.html.twig")
+   	 * @Method("PUT")
+   	 */
+   	public function solicitudAction()
+   	{
+   		$validables = 
+   		 
+		$errors = validarVacios('tipoSolicitudId', 'descripcion', 'foto', 'latitud',
+								 'longitud', 'direccion', 'direccionValidada', 'dispositivoId');
+
+   		$em = $this->getDoctrine()->getManager();
+   		
+   		$request = $this->getRequest();
+   			
+   		$tipoSolicitudId = $request->request->get("tipoSolicitudId");
+   		$descripcion = $request->request->get("descripcion");
+   		$foto = $request->request->get("foto");
+   		$latitud = $request->request->get("latitud");
+   		$longitud = $request->request->get("longitud");
+   		$direccion = $request->request->get("direccion");
+   		$direccionValidada = $request->request->get("direccionValidada");
+   		$dispositivoId = $request->request->get("dispositivoId");
+   		$idiomaId = $request->request->get("idioma");
+   		
+   		$tipoSolicitud = $em->getRepository('ModeloBundle:TipoSolicitud')->findById($tipoSolicitudId);
+   		if ((array_key_exists('tipoSolicitudId') = false) && ($tipoSolicitud == null)){
+   			$errors['tipoSolicitudId'] = $tipoSolicitudId . " es un valor invalido para tipoSolicitudId";
+   		}
+   		    		   		
+   		$dispositivo = $em->getRepository('ModeloBundle:Dispositivo')->findById($dispositivoId);
+   		if ((array_key_exists('dispositivoId') = false) && ($dispositivo == null)){
+   			$errors['dispositivoId'] = $dispositivoId . " es un valor invalido para dispositivoId";
+   		}
+   		
+   		$dispositivo = $em->getRepository('ModeloBundle:Idioma')->findByCodigo($idiomaId);
+   		if ((array_key_exists('idioma') = false) && ($idiomaId == null)){
+   			$errors['idioma'] = $idiomaId . " es un valor invalido para idioma";
+   		}
+
+   		
+   		if (count($errors) == 0){
+			
+   			$foto = base64decode($foto);
+   			$estado = $em->getRepository('ModeloBundle:Estado')->findById(1);
+   			$zona = $em->getRepository('ModeloBundle:Zona')->findById(1);
+   			$solicitante = $em->getRepository('ModeloBundle:Solicitante')->findById(1);
+
+   			//$archivoFoto = 
+   			$pathFoto = $this->container->getParameter('directorio.uploads');
+   			   			
+   			
+   		}
+   		
+
+   		 
+
+   		
+   		
+   		 
+   	}
 }
