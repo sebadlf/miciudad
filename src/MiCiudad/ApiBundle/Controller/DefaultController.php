@@ -2,6 +2,8 @@
 
 namespace MiCiudad\ApiBundle\Controller;
 
+use MiCiudad\ModeloBundle\Entity\CampoExtendido;
+
 use MiCiudad\ModeloBundle\Entity\SolicitudEstado;
 
 use MiCiudad\ModeloBundle\Entity\Solicitud;
@@ -400,17 +402,17 @@ class DefaultController extends Controller
    		
    		$request = $this->getRequest();
    			
-   		$tipoSolicitudId = $request->request->get("tipoSolicitudId");
+   		$tipoSolicitudId = $request->request->get("tipoSolicitudId", 0);
    		$descripcion = $request->request->get("descripcion");
    		$foto = $request->request->get("foto");
    		$latitud = $request->request->get("latitud");
    		$longitud = $request->request->get("longitud");
    		$direccion = $request->request->get("direccion");
    		$direccionValidada = $request->request->get("direccionValidada");
-   		$dispositivoId = $request->request->get("dispositivoId");
-   		$idiomaId = $request->request->get("idioma");
+   		$dispositivoId = $request->request->get("dispositivoId", 0);
+   		$idiomaId = $request->request->get("idioma", "");
+   		$datosExtendidos = $request->request->get("datosExtendidos");
 
-   		
    		$tipoSolicitud = $em->getRepository('ModeloBundle:TipoSolicitud')->find($tipoSolicitudId);
    		if ((array_key_exists('tipoSolicitudId', $errors) == false) && ($tipoSolicitud == null)){
    			$errors['tipoSolicitudId'] = $tipoSolicitudId . " es un valor invalido para tipoSolicitudId";
@@ -423,13 +425,18 @@ class DefaultController extends Controller
    		}
    		
    		$idioma = $em->getRepository('ModeloBundle:Idioma')->findByCodigo($idiomaId);
-   		if ((array_key_exists('idioma', $errors) == false) && ($idioma == null)){
-   			$errors['idioma'] = $idiomaId . " es un valor invalido para idioma";
-   		} else {
-   			$idioma = $idioma[0];
+   		if (array_key_exists('idioma', $errors) == false) {
+	   		if (($idioma == null) || (count($idioma) == 0)){
+	   			$errors['idioma'] = $idiomaId . " es un valor invalido para idioma";
+	   		} else {
+	   			$idioma = $idioma[0];
+	   		}
    		}
    		
-   		
+   		if ($tipoSolicitud != null){
+   			$errors = $this->validarDatosExtendidos($tipoSolicitud, $datosExtendidos, $errors);
+   		}
+   		   		
    		if (count($errors) == 0){
 			
    			$foto = base64_decode($foto);
@@ -514,5 +521,34 @@ class DefaultController extends Controller
    		
    			return new Response($report, 502);
    		}
+   	}
+   	
+   	private function validarDatosExtendidos (\MiCiudad\ModeloBundle\Entity\TipoSolicitud $tipoSolicitud, $datosExtendidos, $errors)
+   	{
+   		while($tipoSolicitud != null){
+   			 
+   			$formulario = $tipoSolicitud->getFormulario();
+   		
+   			if ($formulario != null){
+   				 
+   				foreach ($formulario->getCamposExtendidos() as $campoExtendido) {
+   						
+   					$campoExtendido->getId();
+   					$campoExtendido->getDescripcion();
+   					//$campoExtendido->getTipoDato()->getDescripcion();
+   					   					
+					if ($campoExtendido->getRequerido() == true){
+					   	if (strlen($datosExtendidos[$campoExtendido->getId()] ) == 0){
+   							$errors[$campoExtendido->getId()] = $campoExtendido->getDescripcion() . " es un dato requerido";
+   						}
+					}
+   				}
+   			}
+   		
+   			$tipoSolicitud = $tipoSolicitud->getTipoSolicitudPadre();
+   		}   		
+   		
+   		
+   		return $errors;
    	}
 }
