@@ -28,7 +28,13 @@ class Estado
      */
     private $descripcion;
 
-
+    /**
+     * @var \MiCiudad\ModeloBundle\Entity\SolicitudEstado
+     *
+     * @ORM\OneToMany(targetEntity="SolicitudEstado", mappedBy="estado")
+     */
+    protected $solicitudesEstado;
+    
     /**
      * Get id
      *
@@ -60,5 +66,28 @@ class Estado
     public function getDescripcion()
     {
         return $this->descripcion;
+    }
+    
+    /**
+     * Set solicitudEstados
+     *
+     * @param string $solicitudesEstado
+     * @return Formulario
+     */
+    public function setSolicitudesEstado($solicitudesEstado)
+    {
+    	$this->solicitudesEstado = $solicitudesEstado;
+    
+    	return $this;
+    }
+    
+    /**
+     * Get solicitudesEstado
+     *
+     * @return array
+     */
+    public function getSolicitudesEstado()
+    {
+    	return $this->solicitudesEstado;
     }
 }

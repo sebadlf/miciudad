@@ -22,9 +22,9 @@ class Solicitud
     private $id;
 
     /**
-     * @var string $tipoSolicitud
+     * @var MiCiudad\ModeloBundle\Entity\TipoSolicitud $tipoSolicitud
      *
-     * @ORM\Column(name="tipoSolicitud", type="string", length=255)
+     * @ORM\ManyToOne(targetEntity="MiCiudad\ModeloBundle\Entity\TipoSolicitud")
      */
     private $tipoSolicitud;
 
@@ -50,6 +50,13 @@ class Solicitud
     private $direccion;
 
     /**
+     * @var string $direccionValidada
+     *
+     * @ORM\Column(name="direccionValidada", type="boolean")
+     */
+    private $direccionValidada;    
+    
+    /**
      * @var float $latitud
      *
      * @ORM\Column(name="latitud", type="float")
@@ -64,34 +71,41 @@ class Solicitud
     private $longitud;
 
     /**
-     * @var string $dispositivo
+     * @var MiCiudad\ModeloBundle\Entity\Dispositivo $dispositivo
      *
-     * @ORM\Column(name="dispositivo", type="string", length=255)
+     * @ORM\ManyToOne(targetEntity="MiCiudad\ModeloBundle\Entity\Dispositivo")
      */
     private $dispositivo;
 
     /**
-     * @var string $solicitante
+     * @var MiCiudad\ModeloBundle\Entity\Solicitante $solicitante
      *
-     * @ORM\Column(name="solicitante", type="string", length=255)
+     * @ORM\ManyToOne(targetEntity="MiCiudad\ModeloBundle\Entity\Solicitante")
      */
     private $solicitante;
 
     /**
-     * @var string $zona
+     * @var MiCiudad\ModeloBundle\Entity\Zona $zona
      *
-     * @ORM\Column(name="zona", type="string", length=255)
+     * @ORM\ManyToOne(targetEntity="MiCiudad\ModeloBundle\Entity\Zona")
      */
     private $zona;
 
     /**
-     * @var string $idioma
+     * @var MiCiudad\ModeloBundle\Entity\Idioma $idioma
      *
-     * @ORM\Column(name="idioma", type="string", length=255)
+     * @ORM\ManyToOne(targetEntity="MiCiudad\ModeloBundle\Entity\Idioma")
      */
     private $idioma;
 
-
+    /**
+     * @var \MiCiudad\ModeloBundle\Entity\SolicitudEstado
+     *
+     * @ORM\OneToMany(targetEntity="SolicitudEstado", mappedBy="solicitud")
+     */
+    protected $solicitudEstados;
+    
+    
     /**
      * Get id
      *
@@ -105,10 +119,10 @@ class Solicitud
     /**
      * Set tipoSolicitud
      *
-     * @param string $tipoSolicitud
+     * @param MiCiudad\ModeloBundle\Entity\TipoSolicitud $tipoSolicitud
      * @return Solicitud
      */
-    public function setTipoSolicitud($tipoSolicitud)
+    public function setTipoSolicitud(MiCiudad\ModeloBundle\Entity\TipoSolicitud $tipoSolicitud)
     {
         $this->tipoSolicitud = $tipoSolicitud;
     
@@ -118,7 +132,7 @@ class Solicitud
     /**
      * Get tipoSolicitud
      *
-     * @return string 
+     * @return MiCiudad\ModeloBundle\Entity\TipoSolicitud 
      */
     public function getTipoSolicitud()
     {
@@ -195,6 +209,29 @@ class Solicitud
     }
 
     /**
+     * Set direccionValidada
+     *
+     * @param boolean $direccionValidada
+     * @return Solicitud
+     */
+    public function setDireccionValidada($direccionValidada)
+    {
+    	$this->direccionValidada = $direccionValidada;
+    
+    	return $this;
+    }
+    
+    /**
+     * Get direccionValidada
+     *
+     * @return boolean
+     */
+    public function getDireccionValidada()
+    {
+    	return $this->direccionValidada;
+    }
+    
+    /**
      * Set latitud
      *
      * @param float $latitud
@@ -243,10 +280,10 @@ class Solicitud
     /**
      * Set dispositivo
      *
-     * @param string $dispositivo
+     * @param MiCiudad\ModeloBundle\Entity\Dispositivo $dispositivo
      * @return Solicitud
      */
-    public function setDispositivo($dispositivo)
+    public function setDispositivo(MiCiudad\ModeloBundle\Entity\Dispositivo $dispositivo)
     {
         $this->dispositivo = $dispositivo;
     
@@ -254,7 +291,7 @@ class Solicitud
     }
 
     /**
-     * Get dispositivo
+     * Get MiCiudad\ModeloBundle\Entity\Dispositivo
      *
      * @return string 
      */
@@ -266,10 +303,10 @@ class Solicitud
     /**
      * Set solicitante
      *
-     * @param string $solicitante
+     * @param MiCiudad\ModeloBundle\Entity\Solicitante $solicitante
      * @return Solicitud
      */
-    public function setSolicitante($solicitante)
+    public function setSolicitante(MiCiudad\ModeloBundle\Entity\Solicitante $solicitante)
     {
         $this->solicitante = $solicitante;
     
@@ -279,7 +316,7 @@ class Solicitud
     /**
      * Get solicitante
      *
-     * @return string 
+     * @return MiCiudad\ModeloBundle\Entity\Solicitante 
      */
     public function getSolicitante()
     {
@@ -289,10 +326,10 @@ class Solicitud
     /**
      * Set zona
      *
-     * @param string $zona
+     * @param MiCiudad\ModeloBundle\Entity\Zona $zona
      * @return Solicitud
      */
-    public function setZona($zona)
+    public function setZona(MiCiudad\ModeloBundle\Entity\Zona $zona)
     {
         $this->zona = $zona;
     
@@ -300,7 +337,7 @@ class Solicitud
     }
 
     /**
-     * Get zona
+     * Get MiCiudad\ModeloBundle\Entity\Zona
      *
      * @return string 
      */
@@ -312,10 +349,10 @@ class Solicitud
     /**
      * Set idioma
      *
-     * @param string $idioma
+     * @param MiCiudad\ModeloBundle\Entity\Idioma $idioma
      * @return Solicitud
      */
-    public function setIdioma($idioma)
+    public function setIdioma(MiCiudad\ModeloBundle\Entity\Idioma $idioma)
     {
         $this->idioma = $idioma;
     
@@ -325,10 +362,35 @@ class Solicitud
     /**
      * Get idioma
      *
-     * @return string 
+     * @return MiCiudad\ModeloBundle\Entity\Idioma 
      */
     public function getIdioma()
     {
         return $this->idioma;
     }
+    
+    /**
+     * Set solicitudEstados
+     *
+     * @param array $solicitudEstados
+     * @return Formulario
+     */
+    public function setSolicitudEstados($solicitudEstados)
+    {
+    	$this->solicitudEstados = $solicitudEstados;
+    
+    	return $this;
+    }
+    
+    /**
+     * Get solicitudEstados
+     *
+     * @return array
+     */
+    public function getSolicitudEstados()
+    {
+    	return $this->solicitudEstados;
+    }
+
+    
 }

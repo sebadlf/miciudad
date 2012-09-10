@@ -29,7 +29,7 @@ class CampoExtendido
     private $descripcion;
 
     /**
-     * @var string $formulario
+     * @var MiCiudad\ModeloBundle\Entity\Formulario $formulario
      *
      * @ORM\ManyToOne(targetEntity="MiCiudad\ModeloBundle\Entity\Formulario", inversedBy="camposExtendidos")
      */

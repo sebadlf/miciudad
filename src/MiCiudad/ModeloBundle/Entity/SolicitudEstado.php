@@ -22,16 +22,16 @@ class SolicitudEstado
     private $id;
 
     /**
-     * @var string $solicitud
+     * @var MiCiudad\ModeloBundle\Entity\Solicitud $solicitud
      *
-     * @ORM\Column(name="solicitud", type="string", length=255)
+     * @ORM\ManyToOne(targetEntity="MiCiudad\ModeloBundle\Entity\Solicitud", inversedBy="solicitudEstados")
      */
     private $solicitud;
 
     /**
-     * @var string $estado
+     * @var MiCiudad\ModeloBundle\Entity\Estado $estado
      *
-     * @ORM\Column(name="estado", type="string", length=255)
+     * @ORM\ManyToOne(targetEntity="MiCiudad\ModeloBundle\Entity\Estado", inversedBy="solicitudesEstado")
      */
     private $estado;
 
