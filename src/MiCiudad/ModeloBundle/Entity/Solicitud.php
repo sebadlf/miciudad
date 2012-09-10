@@ -2,6 +2,8 @@
 
 namespace MiCiudad\ModeloBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -28,6 +30,13 @@ class Solicitud
      */
     private $tipoSolicitud;
 
+    /**
+     * @var string $numeroSolicitud
+     *
+     * @ORM\Column(name="numeroSolicitud", type="string", length=255)
+     */
+    private $numeroSolicitud;
+    
     /**
      * @var string $descripcion
      *
@@ -101,9 +110,14 @@ class Solicitud
     /**
      * @var \MiCiudad\ModeloBundle\Entity\SolicitudEstado
      *
-     * @ORM\OneToMany(targetEntity="SolicitudEstado", mappedBy="solicitud")
+     * @ORM\OneToMany(targetEntity="SolicitudEstado", mappedBy="solicitud", cascade="all")
      */
     protected $solicitudEstados;
+    
+    
+    public function __construct(){
+    	$this->solicitudEstados = new ArrayCollection();
+    } 
     
     
     /**
@@ -139,6 +153,29 @@ class Solicitud
         return $this->tipoSolicitud;
     }
 
+    /**
+     * Set numeroSolicitud
+     *
+     * @param string $numeroSolicitud
+     * @return Solicitud
+     */
+    public function setNumeroSolicitud($numeroSolicitud)
+    {
+    	$this->numeroSolicitud = $numeroSolicitud;
+    
+    	return $this;
+    }
+    
+    /**
+     * Get numeroSolicitud
+     *
+     * @return string
+     */
+    public function getNumeroSolicitud()
+    {
+    	return $this->numeroSolicitud;
+    }
+    
     /**
      * Set descripcion
      *
@@ -283,7 +320,7 @@ class Solicitud
      * @param MiCiudad\ModeloBundle\Entity\Dispositivo $dispositivo
      * @return Solicitud
      */
-    public function setDispositivo(MiCiudad\ModeloBundle\Entity\Dispositivo $dispositivo)
+    public function setDispositivo(\MiCiudad\ModeloBundle\Entity\Dispositivo $dispositivo)
     {
         $this->dispositivo = $dispositivo;
     
@@ -306,7 +343,7 @@ class Solicitud
      * @param MiCiudad\ModeloBundle\Entity\Solicitante $solicitante
      * @return Solicitud
      */
-    public function setSolicitante(MiCiudad\ModeloBundle\Entity\Solicitante $solicitante)
+    public function setSolicitante(\MiCiudad\ModeloBundle\Entity\Solicitante $solicitante)
     {
         $this->solicitante = $solicitante;
     
@@ -329,7 +366,7 @@ class Solicitud
      * @param MiCiudad\ModeloBundle\Entity\Zona $zona
      * @return Solicitud
      */
-    public function setZona(MiCiudad\ModeloBundle\Entity\Zona $zona)
+    public function setZona(\MiCiudad\ModeloBundle\Entity\Zona $zona)
     {
         $this->zona = $zona;
     
@@ -352,7 +389,7 @@ class Solicitud
      * @param MiCiudad\ModeloBundle\Entity\Idioma $idioma
      * @return Solicitud
      */
-    public function setIdioma(MiCiudad\ModeloBundle\Entity\Idioma $idioma)
+    public function setIdioma(\MiCiudad\ModeloBundle\Entity\Idioma $idioma)
     {
         $this->idioma = $idioma;
     

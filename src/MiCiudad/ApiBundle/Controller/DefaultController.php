@@ -394,7 +394,7 @@ class DefaultController extends Controller
    	public function solicitudAction()
    	{
 		$errors = $this->validarVacios(array ('tipoSolicitudId', 'descripcion', 'foto', 'latitud',
-								 'longitud', 'direccion', 'direccionValidada', 'dispositivoId', 'idiomaId'));
+								 'longitud', 'direccion', 'direccionValidada', 'dispositivoId', 'idioma'));
 
    		$em = $this->getDoctrine()->getManager();
    		
@@ -411,40 +411,45 @@ class DefaultController extends Controller
    		$idiomaId = $request->request->get("idioma");
 
    		
-   		$tipoSolicitud = $em->getRepository('ModeloBundle:TipoSolicitud')->findById($tipoSolicitudId);
+   		$tipoSolicitud = $em->getRepository('ModeloBundle:TipoSolicitud')->find($tipoSolicitudId);
    		if ((array_key_exists('tipoSolicitudId', $errors) == false) && ($tipoSolicitud == null)){
    			$errors['tipoSolicitudId'] = $tipoSolicitudId . " es un valor invalido para tipoSolicitudId";
    		}
    		    		   		
-   		$dispositivo = $em->getRepository('ModeloBundle:Dispositivo')->findById($dispositivoId);
+   		$dispositivo = $em->getRepository('ModeloBundle:Dispositivo')->find($dispositivoId);
+   		
    		if ((array_key_exists('dispositivoId', $errors) == false) && ($dispositivo == null)){
    			$errors['dispositivoId'] = $dispositivoId . " es un valor invalido para dispositivoId";
    		}
    		
-   		$dispositivo = $em->getRepository('ModeloBundle:Idioma')->findByCodigo($idiomaId);
-   		if ((array_key_exists('idioma', $errors) == false) && ($idiomaId == null)){
+   		$idioma = $em->getRepository('ModeloBundle:Idioma')->findByCodigo($idiomaId);
+   		if ((array_key_exists('idioma', $errors) == false) && ($idioma == null)){
    			$errors['idioma'] = $idiomaId . " es un valor invalido para idioma";
+   		} else {
+   			$idioma = $idioma[0];
    		}
+   		
    		
    		if (count($errors) == 0){
 			
-   			$foto = base64decode($foto);
-   			$estado = $em->getRepository('ModeloBundle:Estado')->findById(1);
-   			$zona = $em->getRepository('ModeloBundle:Zona')->findById(1);
-   			$solicitante = $em->getRepository('ModeloBundle:Solicitante')->findById(1);
+   			$foto = base64_decode($foto);
+   			$estado = $em->getRepository('ModeloBundle:Estado')->find(1);
+   			$zona = $em->getRepository('ModeloBundle:Zona')->find(1);
+   			$solicitante = $em->getRepository('ModeloBundle:Solicitante')->find(1);
 
    			$now = new \DateTime();
-   			$fechaFormateada = $now->format('Y-m-d H:i:s');
+   			$fechaFormateada = $now->format('Y-m-d_H-i-s');
    			$tipoSolicitudFormateada = substr("00000000" . $tipoSolicitudId, -8);
    			$dispositivoFormateado = substr("00000000" . $dispositivoId, -8);
    			
-   			$archivoFoto =  $fechaFormateada . "_ " . $tipoSolicitudFormateada . "_" . $dispositivoFormateado . ".jpg";
-   			$pathFoto = $this->container->getParameter('directorio.uploads') . "solicitud/temp/" . $archivoFoto;
+   			$archivoFoto =  $fechaFormateada . "_" . $tipoSolicitudFormateada . "_" . $dispositivoFormateado . ".jpg";
+   			$pathFoto = "solicitud/temp/" . $archivoFoto;
 
-   			file_put_contents($pathFoto, $foto);
+   			file_put_contents($this->container->getParameter('directorio.uploads') . $pathFoto, $foto);
 
    			$solicitud = new Solicitud();
    			
+   			$solicitud->setNumeroSolicitud(-1);
    			$solicitud->setDescripcion($descripcion);
    			$solicitud->setFoto($pathFoto);
    			$solicitud->setDireccion($direccion);
@@ -465,25 +470,44 @@ class DefaultController extends Controller
    			$em->flush();
    			
    			$id = $solicitud->getId();
-   			$idFormateado = substr("00000000" . $id);
+   			$idFormateado = substr("00000000" . $id, -8);
    			   			
    			$carpeta = (int)($id / 1000);
    			
    			$carpetaFormateada = substr("00000000" . $carpeta . "000", -8); 
    			
-   			mkdir($this->container->getParameter('directorio.uploads') . "solicitud/" . $carpetaFormateada . "/" . $idFormateado, 777, true);
+   			if (file_exists($this->container->getParameter('directorio.uploads') . "solicitud/" . $carpetaFormateada) == false){
+   				mkdir($this->container->getParameter('directorio.uploads') . "solicitud/" . $carpetaFormateada);
+   			}
+   			
+   			mkdir($this->container->getParameter('directorio.uploads') . "solicitud/" . $carpetaFormateada . "/" . $idFormateado);
    			$pathFotoDestino = "solicitud/" . $carpetaFormateada . "/" . $idFormateado . "/" . $idFormateado . ".jpg";
   			   			
-   			rename($pathFoto, $this->container->getParameter('directorio.uploads') . $pathFotoDestino);
-   			
-   			$solicitud = $em->getRepository('ModeloBundle:TipoSolicitud')->findById($id);
-   			
+   			rename($this->container->getParameter('directorio.uploads') . $pathFoto, $this->container->getParameter('directorio.uploads') . $pathFotoDestino);
+  			
+   			$solicitud->setNumeroSolicitud($idFormateado);
    			$solicitud->setFoto($pathFotoDestino);
    			
    			$em->persist($solicitud);
    			$em->flush();
- 			
+   			   				
+   			$result = array(
+   								"status" => "ok", 
+   								"id" => $solicitud->getId(), 
+   								"numeroSolicitud" => $solicitud->getNumeroSolicitud()
+   							);
    			
+   			
+   			$serializer = $this->container->get('serializer');
+   			$report = $serializer->serialize($result, 'json');
+   			
+   			return new Response($report);
+   			
+   		} else {
+   			$serializer = $this->container->get('serializer');
+   			$report = $serializer->serialize($errors, 'json');
+   		
+   			return new Response($report, 502);
    		}
    	}
 }
