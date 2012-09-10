@@ -501,11 +501,16 @@ class DefaultController extends Controller
    			$serializer = $this->container->get('serializer');
    			$report = $serializer->serialize($result, 'json');
    			
-   			return new Response($report);
+   			return new Response($report, 201);
    			
    		} else {
+   			
+   			$responseErrors["status"] = "invalid";
+   			$responseErrors["form"] = array();
+   			$responseErrors["datos"] = $errors;
+   			
    			$serializer = $this->container->get('serializer');
-   			$report = $serializer->serialize($errors, 'json');
+   			$report = $serializer->serialize($responseErrors, 'json');
    		
    			return new Response($report, 502);
    		}
