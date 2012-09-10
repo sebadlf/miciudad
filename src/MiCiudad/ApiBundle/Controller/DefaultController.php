@@ -2,6 +2,8 @@
 
 namespace MiCiudad\ApiBundle\Controller;
 
+use MiCiudad\ModeloBundle\Entity\DatoExtendido;
+
 use MiCiudad\ModeloBundle\Entity\CampoExtendido;
 
 use MiCiudad\ModeloBundle\Entity\SolicitudEstado;
@@ -279,6 +281,7 @@ class DefaultController extends Controller
 					
 					$resultado[$i]["id"] = $datoExtendido->getId();
 					$resultado[$i]["descripcion"] = $datoExtendido->getDescripcion();
+					$resultado[$i]["requerido"] = $datoExtendido->getRequerido();
 					$resultado[$i]["tipoControl"] = $datoExtendido->getTipoControl()->getDescripcion();
 					$resultado[$i]["tipoDato"] = $datoExtendido->getTipoDato()->getDescripcion();
 					
@@ -395,8 +398,7 @@ class DefaultController extends Controller
    	 */
    	public function solicitudAction()
    	{
-		$errors = $this->validarVacios(array ('tipoSolicitudId', 'descripcion', 'foto', 'latitud',
-								 'longitud', 'direccion', 'direccionValidada', 'dispositivoId', 'idioma'));
+		$errors = $this->validarVacios(array ('tipoSolicitudId', 'descripcion', 'direccion', 'direccionValidada', 'dispositivoId', 'idioma'));
 
    		$em = $this->getDoctrine()->getManager();
    		
@@ -404,14 +406,14 @@ class DefaultController extends Controller
    			
    		$tipoSolicitudId = $request->request->get("tipoSolicitudId", 0);
    		$descripcion = $request->request->get("descripcion");
-   		$foto = $request->request->get("foto");
-   		$latitud = $request->request->get("latitud");
-   		$longitud = $request->request->get("longitud");
+   		$foto = $request->request->get("foto", null);
+   		$latitud = $request->request->get("latitud", null);
+   		$longitud = $request->request->get("longitud", null);
    		$direccion = $request->request->get("direccion");
    		$direccionValidada = $request->request->get("direccionValidada");
    		$dispositivoId = $request->request->get("dispositivoId", 0);
    		$idiomaId = $request->request->get("idioma", "");
-   		$datosExtendidos = $request->request->get("datosExtendidos");
+   		$datosExtendidos = $request->request->get("datos_extendidos");
 
    		$tipoSolicitud = $em->getRepository('ModeloBundle:TipoSolicitud')->find($tipoSolicitudId);
    		if ((array_key_exists('tipoSolicitudId', $errors) == false) && ($tipoSolicitud == null)){
@@ -439,7 +441,10 @@ class DefaultController extends Controller
    		   		
    		if (count($errors) == 0){
 			
-   			$foto = base64_decode($foto);
+   			if ($foto != null){
+   				$foto = base64_decode($foto);
+   			}
+   			
    			$estado = $em->getRepository('ModeloBundle:Estado')->find(1);
    			$zona = $em->getRepository('ModeloBundle:Zona')->find(1);
    			$solicitante = $em->getRepository('ModeloBundle:Solicitante')->find(1);
@@ -449,13 +454,17 @@ class DefaultController extends Controller
    			$tipoSolicitudFormateada = substr("00000000" . $tipoSolicitudId, -8);
    			$dispositivoFormateado = substr("00000000" . $dispositivoId, -8);
    			
-   			$archivoFoto =  $fechaFormateada . "_" . $tipoSolicitudFormateada . "_" . $dispositivoFormateado . ".jpg";
-   			$pathFoto = "solicitud/temp/" . $archivoFoto;
-
-   			file_put_contents($this->container->getParameter('directorio.uploads') . $pathFoto, $foto);
-
+   			$pathFoto = null;
+   			if ($foto != null){
+	   			$archivoFoto =  $fechaFormateada . "_" . $tipoSolicitudFormateada . "_" . $dispositivoFormateado . ".jpg";
+	   			$pathFoto = "solicitud/temp/" . $archivoFoto;
+	
+	   			file_put_contents($this->container->getParameter('directorio.uploads') . $pathFoto, $foto);
+   			}
+   			
    			$solicitud = new Solicitud();
    			
+   			$solicitud->setTipoSolicitud($tipoSolicitud);   			
    			$solicitud->setNumeroSolicitud(-1);
    			$solicitud->setDescripcion($descripcion);
    			$solicitud->setFoto($pathFoto);
@@ -464,21 +473,40 @@ class DefaultController extends Controller
    			$solicitud->setLongitud($longitud);
    			$solicitud->setDireccionValidada($direccionValidada);
    			$solicitud->setDispositivo($dispositivo);
+   			$solicitud->setSolicitante($solicitante);
    			$solicitud->setIdioma($idioma);
    			$solicitud->setZona($zona);
    			
+   			
    			$solicitudEstado = new SolicitudEstado();
+   			$solicitudEstado->setSolicitud($solicitud);
    			$solicitudEstado->setEstado($estado);
    			$solicitudEstado->setFecha(new \DateTime());
    			
    			$solicitud->getSolicitudEstados()->Add($solicitudEstado);
-   			   			
+
+   			foreach ($datosExtendidos as $key => $value) {
+   				
+   				$campoExtendido = $em->getRepository('ModeloBundle:CampoExtendido')->find($key);
+   				
+   				$datoExtendido = new DatoExtendido();
+   				
+   				$datoExtendido->setSolicitud($solicitud);
+   				$datoExtendido->setCampoExtendido($campoExtendido);
+   				$datoExtendido->setValor($value);
+   				
+   				$solicitud->getDatosExtendidos()->Add($datoExtendido);
+   			}	   			
+   			
    			$em->persist($solicitud);
    			$em->flush();
-   			
+
    			$id = $solicitud->getId();
    			$idFormateado = substr("00000000" . $id, -8);
-   			   			
+   			
+   			$solicitud->setNumeroSolicitud($idFormateado);
+
+   			//Carpeta de la solicitud
    			$carpeta = (int)($id / 1000);
    			
    			$carpetaFormateada = substr("00000000" . $carpeta . "000", -8); 
@@ -490,10 +518,10 @@ class DefaultController extends Controller
    			mkdir($this->container->getParameter('directorio.uploads') . "solicitud/" . $carpetaFormateada . "/" . $idFormateado);
    			$pathFotoDestino = "solicitud/" . $carpetaFormateada . "/" . $idFormateado . "/" . $idFormateado . ".jpg";
   			   			
-   			rename($this->container->getParameter('directorio.uploads') . $pathFoto, $this->container->getParameter('directorio.uploads') . $pathFotoDestino);
-  			
-   			$solicitud->setNumeroSolicitud($idFormateado);
-   			$solicitud->setFoto($pathFotoDestino);
+   			if ($foto != null){
+   				rename($this->container->getParameter('directorio.uploads') . $pathFoto, $this->container->getParameter('directorio.uploads') . $pathFotoDestino);
+   				$solicitud->setFoto($pathFotoDestino);
+   			}
    			
    			$em->persist($solicitud);
    			$em->flush();
