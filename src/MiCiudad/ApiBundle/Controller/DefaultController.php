@@ -403,7 +403,8 @@ class DefaultController extends Controller
    	public function solicitudAction()
    	{
 		$errors = $this->validarVacios(array ('tipoSolicitudId', 'descripcion', 'direccion', 'direccionValidada', 'dispositivoId', 'idioma'));
-
+		$errors_datosPersonales = array();
+				
    		$em = $this->getDoctrine()->getManager();
    		
    		$request = $this->getRequest();
@@ -443,8 +444,10 @@ class DefaultController extends Controller
    		if ($tipoSolicitud != null){
    			$errors = $this->validarDatosExtendidos($tipoSolicitud, $datosExtendidos, $errors);
    		}
+
+		$errors_datosPersonales = $this->validarDatosPersonales($datosPersonales);
    		   		
-   		if (count($errors) == 0){
+   		if ((count($errors) == 0) && (count($errors_datosPersonales) == 0)){
 			
    			if ($foto != null){
    				$foto = base64_decode($foto);
@@ -553,8 +556,9 @@ class DefaultController extends Controller
    		} else {
    			
    			$responseErrors["status"] = "invalid";
-   			$responseErrors["form"] = array();
+   			$responseErrors["form"] = array("Existen errores en el formulario");
    			$responseErrors["datos"] = $errors;
+   			$responseErrors["datos_personales"] = $errors_datosPersonales;
    			
    			$serializer = $this->container->get('serializer');
    			$report = $serializer->serialize($responseErrors, 'json');
@@ -589,6 +593,28 @@ class DefaultController extends Controller
    		}   		
    		
    		
+   		return $errors;
+   	}
+   	
+   	private function validarDatosPersonales($datosPersonales){
+  		
+   		$errors = array();
+   		
+   		$em = $this->getDoctrine()->getManager();
+   		 
+   		$keys = array("requerido" => true);
+   		
+   		$datosRequeridos = $em->getRepository('ModeloBundle:DatoPersonalSolicitante')->findBy($keys);
+   		 
+   		foreach ($datosRequeridos as $datoPersonal) {
+   			   			
+   			$valor = $this->datoPersonalObtenerValor($datosPersonales, $datoPersonal->getCodigo());
+   			
+   			if (empty($valor) == true){
+   				$errors[$datoPersonal->getCodigo()] = $datoPersonal->getDescripcion() . " es un dato requerido";
+   			}
+  		}
+  		
    		return $errors;
    	}
    	
@@ -642,9 +668,9 @@ class DefaultController extends Controller
    		$result = null;
    		
    		if (array_key_exists($key, $datosPersonales) == true){
-   			$result = $datosPersonales[$key];
+   			$result = trim($datosPersonales[$key]);
    			
-   			if (strlen($key) == 0){
+   			if (strlen($result) == 0){
    				$result = null;
    			}
    		}
