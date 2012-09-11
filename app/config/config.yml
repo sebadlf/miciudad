@@ -8,7 +8,6 @@ parameters:
     directorio.uploads: %kernel.root_dir%/../web/uploads/
     directorio.uploads.cache: %kernel.root_dir%/../web/uploads/cache/
 
-
 framework:
     #esi:             ~
     #translator:      { fallback: %locale% }

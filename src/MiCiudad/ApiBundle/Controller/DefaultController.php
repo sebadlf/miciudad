@@ -564,8 +564,14 @@ class DefaultController extends Controller
    			}
    			
    			$responseErrors["form"] = array($error);
-   			$responseErrors["datos"] = $errors;
-   			$responseErrors["datos_personales"] = $errors_datosPersonales;
+   			
+   			if (count($errors) > 0){
+   				$responseErrors["datos"] = $errors;
+   			}
+   			
+   			if (count($errors_datosPersonales) > 0){
+   				$responseErrors["datos_personales"] = $errors_datosPersonales;
+   			}
    			
    			$serializer = $this->container->get('serializer');
    			$report = $serializer->serialize($responseErrors, 'json');
@@ -609,20 +615,14 @@ class DefaultController extends Controller
    		
    		$em = $this->getDoctrine()->getManager();
    		 
-   		$keys = array("requerido" => true);
-   		
    		$qb = $em->createQueryBuilder();
    		
-   		$qb->select('dp')
-		   ->from('ModeloBundle:DatoPersonalSolicitante', 'dp')
-		   ->where('dp.requerido = true or dp.clave = true');
+   		$qb->select('dp')->from('ModeloBundle:DatoPersonalSolicitante', 'dp')->where('dp.requerido = true or dp.clave = true');
    		
    		$query = $qb->getQuery();
    		
    		$datosRequeridos  = $query->getResult();
-   		
-   		//$datosRequeridos = $em->getRepository('ModeloBundle:DatoPersonalSolicitante')->findBy($keys);
-   		 
+
    		foreach ($datosRequeridos as $datoPersonal) {
    			   			
    			$valor = $this->datoPersonalObtenerValor($datosPersonales, $datoPersonal->getCodigo());
@@ -693,6 +693,64 @@ class DefaultController extends Controller
    		}
    		   		
    		return $result; 
+   	}
+
+   	/**
+   	 * @Route("/solicitud/{tipo}")
+   	 * @Template("ModeloBundle:Default:index.html.twig")
+   	 * @Method("GET")
+   	 */
+   	public function tipoSolicitudListAction($tipo)
+   	{
+   		$em = $this->getDoctrine()->getManager();
+   		$qb = $em->createQueryBuilder();
+   		
+   		$request = $this->getRequest();
+   		 
+   		$tiposSolicitudes = $em->getRepository('ModeloBundle:TipoSolicitud')->findBy(array("tipoSolicitudPadre" => null));
+
+   		$largoDescripcion = $request->query->get("largoDescripcion", null);
+   		$anchoImagen = $request->query->get("anchoImagen", null);
+   		$altoImagen = $request->query->get("altoImagen", null);
+   		
+   		$dispositivoId = $request->query->get("dispositivoId", null);
+   		
+   		$latitud = $request->query->get("latitud", null);
+   		$longitud = $request->query->get("longitud", null);
+
+   		
+   		$qb->setFirstResult(0);
+   		$qb->setMaxResults(30);
+   		
+   		$q = $em->createQuery();
+   		if ($tipo == "mias"){
+   			$qb->select('s')->from('ModeloBundle:Solicitud', 's')->where('s.dispositivo = :dispositivoId')->setParameter('dispositivoId',  $dispositivoId);
+   		} else if ($tipo == "cercanas"){
+   			$qb->select('s')->from('ModeloBundle:Solicitud', 's');
+   		} else if ($tipo == "ultimas"){
+   			$qb->select('s', 'se')->from('ModeloBundle:Solicitud', 's')
+   							->innerjoin("ModeloBundle:SolicitudEstado", "se")->orderBy('se.fecha', "DESC");
+   		}
+   		   		
+   		$query = $qb->getQuery();
+   		
+   		echo $query->getSql();
+   		 		
+   		
+   		$solicitudes  = $query->getResult();
+   		    		
+   		/*
+   		$i = 0;
+   		$result = array();
+   		foreach ($tiposSolicitudes as $tipoSolicitud) {
+   			$result[$i] = $this->generarArrayRecursivo($tipoSolicitud, $anchoIcono, $altoIcono, $largoTitulo, $largoDescripcion);
+   		}
+   		*/
+   		
+   		$serializer = $this->container->get('serializer');
+   		$report = $serializer->serialize($solicitudes, 'json');
+   	
+   		return new Response($report);
    	}
    	
 }
