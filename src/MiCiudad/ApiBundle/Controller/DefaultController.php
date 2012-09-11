@@ -611,7 +611,17 @@ class DefaultController extends Controller
    		 
    		$keys = array("requerido" => true);
    		
-   		$datosRequeridos = $em->getRepository('ModeloBundle:DatoPersonalSolicitante')->findBy($keys);
+   		$qb = $em->createQueryBuilder();
+   		
+   		$qb->select('dp')
+		   ->from('ModeloBundle:DatoPersonalSolicitante', 'dp')
+		   ->where('dp.requerido = true or dp.clave = true');
+   		
+   		$query = $qb->getQuery();
+   		
+   		$datosRequeridos  = $query->getResult();
+   		
+   		//$datosRequeridos = $em->getRepository('ModeloBundle:DatoPersonalSolicitante')->findBy($keys);
    		 
    		foreach ($datosRequeridos as $datoPersonal) {
    			   			
