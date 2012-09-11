@@ -556,7 +556,14 @@ class DefaultController extends Controller
    		} else {
    			
    			$responseErrors["status"] = "invalid";
-   			$responseErrors["form"] = array("Existen errores en el formulario");
+   			
+   			if (count($errors_datosPersonales) > 0){
+   				$error = "Existen errores en sus datos personales";
+   			} else {
+   				$error = "Existen errores en su solicitud";
+   			}
+   			
+   			$responseErrors["form"] = array($error);
    			$responseErrors["datos"] = $errors;
    			$responseErrors["datos_personales"] = $errors_datosPersonales;
    			
