@@ -24,70 +24,71 @@ class Solicitante
     /**
      * @var string $nombre
      *
-     * @ORM\Column(name="nombre", type="string", length=255)
+     * @ORM\Column(name="nombre", type="string", length=255, nullable=true)
      */
     private $nombre;
 
     /**
      * @var string $apellido
      *
-     * @ORM\Column(name="apellido", type="string", length=255)
+     * @ORM\Column(name="apellido", type="string", length=255, nullable=true)
      */
     private $apellido;
 
     /**
      * @var string $email
      *
-     * @ORM\Column(name="email", type="string", length=255)
+     * @ORM\Column(name="email", type="string", length=255, nullable=true)
      */
     private $email;
 
     /**
      * @var integer $dni
      *
-     * @ORM\Column(name="dni", type="integer")
+     * @ORM\Column(name="dni", type="integer", nullable=true)
      */
     private $dni;
 
     /**
      * @var string $cuit
      *
-     * @ORM\Column(name="cuit", type="string", length=13)
+     * @ORM\Column(name="cuit", type="string", length=13, nullable=true)
      */
     private $cuit;
 
     /**
      * @var string $cpf
      *
-     * @ORM\Column(name="cpf", type="string", length=15)
+     * @ORM\Column(name="cpf", type="string", length=15, nullable=true)
      */
     private $cpf;
 
     /**
      * @var \DateTime $fechaNacimiento
      *
-     * @ORM\Column(name="fechaNacimiento", type="date")
+     * @ORM\Column(name="fechaNacimiento", type="date", nullable=true)
      */
     private $fechaNacimiento;
 
     /**
      * @var string $sexo
      *
-     * @ORM\Column(name="sexo", type="string", length=1)
+	 * @ORM\ManyToOne(targetEntity="MiCiudad\ModeloBundle\Entity\Sexo")
+	 * @ORM\JoinColumn(name="sexo_id", referencedColumnName="id", nullable=true)
      */
     private $sexo;
 
     /**
      * @var string $telefono
      *
-     * @ORM\Column(name="telefono", type="string", length=15)
+     * @ORM\Column(name="telefono", type="string", length=15, nullable=true)
      */
     private $telefono;
 
     /**
      * @var string $celular
      *
-     * @ORM\Column(name="celular", type="string", length=15)
+     * @ORM\Column(name="celular", type="string", length=15, nullable=true)
      */
     private $celular;
 
@@ -266,10 +267,10 @@ class Solicitante
     /**
      * Set sexo
      *
-     * @param string $sexo
+     * @param MiCiudad\ModeloBundle\Entity\Sexo $sexo
      * @return Solicitante
      */
-    public function setSexo($sexo)
+    public function setSexo(\MiCiudad\ModeloBundle\Entity\Sexo $sexo = null)
     {
         $this->sexo = $sexo;
     
@@ -279,7 +280,7 @@ class Solicitante
     /**
      * Get sexo
      *
-     * @return string 
+     * @return MiCiudad\ModeloBundle\Entity\Sexo 
      */
     public function getSexo()
     {

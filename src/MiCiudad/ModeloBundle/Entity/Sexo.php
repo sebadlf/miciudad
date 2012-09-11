@@ -22,9 +22,16 @@ class Sexo
     private $id;
 
     /**
+     * @var string $codigo
+     *
+     * @ORM\Column(name="codigo", type="string", length=1)
+     */
+    private $codigo;
+
+    /**
      * @var string $descripcion
      *
-     * @ORM\Column(name="descripcion", type="string", length=255)
+     * @ORM\Column(name="descripcion", type="string", length=50)
      */
     private $descripcion;
 
@@ -37,6 +44,29 @@ class Sexo
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * Set codigo
+     *
+     * @param string $codigo
+     * @return Sexo
+     */
+    public function setCodigo($codigo)
+    {
+        $this->codigo = $codigo;
+    
+        return $this;
+    }
+
+    /**
+     * Get codigo
+     *
+     * @return string 
+     */
+    public function getCodigo()
+    {
+        return $this->codigo;
     }
 
     /**

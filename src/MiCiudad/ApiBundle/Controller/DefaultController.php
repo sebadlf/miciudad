@@ -2,6 +2,10 @@
 
 namespace MiCiudad\ApiBundle\Controller;
 
+use MiCiudad\ModeloBundle\Entity\Solicitante;
+
+use MiCiudad\ModeloBundle\Entity\DatoPersonal;
+
 use MiCiudad\ModeloBundle\Entity\DatoExtendido;
 
 use MiCiudad\ModeloBundle\Entity\CampoExtendido;
@@ -414,6 +418,7 @@ class DefaultController extends Controller
    		$dispositivoId = $request->request->get("dispositivoId", 0);
    		$idiomaId = $request->request->get("idioma", "");
    		$datosExtendidos = $request->request->get("datos_extendidos");
+   		$datosPersonales = $request->request->get("datos_personales", array());
 
    		$tipoSolicitud = $em->getRepository('ModeloBundle:TipoSolicitud')->find($tipoSolicitudId);
    		if ((array_key_exists('tipoSolicitudId', $errors) == false) && ($tipoSolicitud == null)){
@@ -447,7 +452,7 @@ class DefaultController extends Controller
    			
    			$estado = $em->getRepository('ModeloBundle:Estado')->find(1);
    			$zona = $em->getRepository('ModeloBundle:Zona')->find(1);
-   			$solicitante = $em->getRepository('ModeloBundle:Solicitante')->find(1);
+   			$solicitante = $this->procesarDatosPersonales($datosPersonales);
 
    			$now = new \DateTime();
    			$fechaFormateada = $now->format('Y-m-d_H-i-s');
@@ -486,7 +491,7 @@ class DefaultController extends Controller
    			$solicitud->getSolicitudEstados()->Add($solicitudEstado);
 
    			//Si es un array asociativo guardo los datos extendidos
-   			if (((is_array($campoExtendido) == true)) && (array_keys($datosExtendidos) !== range(0, count($datosExtendidos) - 1)))
+   			if (((is_array($datosExtendidos) == true)) && (array_keys($datosExtendidos) !== range(0, count($datosExtendidos) - 1)))
    			{
 	   			foreach ($datosExtendidos as $key => $value) {
 	   				
@@ -573,7 +578,7 @@ class DefaultController extends Controller
    					//$campoExtendido->getTipoDato()->getDescripcion();
    					   					
 					if ($campoExtendido->getRequerido() == true){
-					   	if ((is_array($campoExtendido) == false) || (strlen($datosExtendidos[$campoExtendido->getId()] ) == 0)){
+					   	if ((is_array($datosExtendidos) == false) || (strlen($datosExtendidos[$campoExtendido->getId()] ) == 0)){
    							$errors[$campoExtendido->getId()] = $campoExtendido->getDescripcion() . " es un dato requerido";
    						}
 					}
@@ -586,4 +591,65 @@ class DefaultController extends Controller
    		
    		return $errors;
    	}
+   	
+   	private function procesarDatosPersonales($datosPersonales){
+   		
+   		$em = $this->getDoctrine()->getManager();
+   		
+   		$datosPersonalesClave = $em->getRepository('ModeloBundle:DatoPersonalSolicitante')->findByClave(true);
+   		$datosPersonalesSistema = $em->getRepository('ModeloBundle:DatoPersonalSolicitante')->findByRequerido(true);
+   		
+   		$arrayClaves = array();
+   		foreach ($datosPersonalesClave as $datoPersonalClave) {
+   			$arrayClaves[$datoPersonalClave->getCodigo()] = $this->datoPersonalObtenerValor($datosPersonales, $datoPersonalClave->getCodigo());  
+   		}   		
+   		
+   		$solicitantes = $em->getRepository('ModeloBundle:Solicitante')->findBy($arrayClaves);
+   		   		   		
+   		$solicitante = null;
+   		if (count($solicitantes) > 0){
+   			$solicitante = $solicitantes[0];
+   		} else {
+   			$solicitante = new Solicitante();
+   		}
+   		
+   		$solicitante->setNombre($this->datoPersonalObtenerValor($datosPersonales, "nombre"));
+   		$solicitante->setApellido($this->datoPersonalObtenerValor($datosPersonales, "apellido"));
+   		$solicitante->setEmail($this->datoPersonalObtenerValor($datosPersonales, "email"));
+   		$solicitante->setDni($this->datoPersonalObtenerValor($datosPersonales, "dni"));
+   		$solicitante->setCuit($this->datoPersonalObtenerValor($datosPersonales, "cuit"));
+   		$solicitante->setCpf($this->datoPersonalObtenerValor($datosPersonales, "cpf"));
+   		$solicitante->setFechaNacimiento($this->datoPersonalObtenerValor($datosPersonales, "fechaNacimiento"));
+   		$solicitante->setTelefono($this->datoPersonalObtenerValor($datosPersonales, "telefono"));
+   		$solicitante->setCelular($this->datoPersonalObtenerValor($datosPersonales, "celular"));
+   		
+   		$sexoStr = $this->datoPersonalObtenerValor($datosPersonales, "sexo");
+   		
+   		$sexos = $em->getRepository('ModeloBundle:Sexo')->findByCodigo($sexoStr);
+   		
+   		$sexo = null;
+   		if (count($sexo) > 0){
+   			$sexo = $sexos[0];
+   		}
+   		
+   		$solicitante->setSexo($sexo);
+   		
+   		return $solicitante;
+   	} 
+   	
+   	private function datoPersonalObtenerValor($datosPersonales, $key){
+   		
+   		$result = null;
+   		
+   		if (array_key_exists($key, $datosPersonales) == true){
+   			$result = $datosPersonales[$key];
+   			
+   			if (strlen($key) == 0){
+   				$result = null;
+   			}
+   		}
+   		   		
+   		return $result; 
+   	}
+   	
 }

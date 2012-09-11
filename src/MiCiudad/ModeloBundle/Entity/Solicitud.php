@@ -89,7 +89,7 @@ class Solicitud {
 	/**
 	 * @var MiCiudad\ModeloBundle\Entity\Solicitante $solicitante
 	 *
-	 * @ORM\ManyToOne(targetEntity="MiCiudad\ModeloBundle\Entity\Solicitante")
+	 * @ORM\ManyToOne(targetEntity="MiCiudad\ModeloBundle\Entity\Solicitante", cascade="persist")
 	 * @ORM\JoinColumn(name="solicitante_id", referencedColumnName="id", nullable=false)
 	 */
 	private $solicitante;
