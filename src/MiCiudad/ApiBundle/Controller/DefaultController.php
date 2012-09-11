@@ -485,17 +485,24 @@ class DefaultController extends Controller
    			
    			$solicitud->getSolicitudEstados()->Add($solicitudEstado);
 
-   			foreach ($datosExtendidos as $key => $value) {
-   				
-   				$campoExtendido = $em->getRepository('ModeloBundle:CampoExtendido')->find($key);
-   				
-   				$datoExtendido = new DatoExtendido();
-   				
-   				$datoExtendido->setSolicitud($solicitud);
-   				$datoExtendido->setCampoExtendido($campoExtendido);
-   				$datoExtendido->setValor($value);
-   				
-   				$solicitud->getDatosExtendidos()->Add($datoExtendido);
+   			//Si es un array asociativo guardo los datos extendidos
+   			if (((is_array($campoExtendido) == true)) && (array_keys($datosExtendidos) !== range(0, count($datosExtendidos) - 1)))
+   			{
+	   			foreach ($datosExtendidos as $key => $value) {
+	   				
+	   				$campoExtendido = $em->getRepository('ModeloBundle:CampoExtendido')->find($key);
+	   				
+	   				if ($campoExtendido != null)
+	   				{
+		   				$datoExtendido = new DatoExtendido();
+	   				
+	   					$datoExtendido->setSolicitud($solicitud);
+	   					$datoExtendido->setCampoExtendido($campoExtendido);
+	   					$datoExtendido->setValor($value);
+	   				
+	   					$solicitud->getDatosExtendidos()->Add($datoExtendido);
+	   				}
+	   			}
    			}	   			
    			
    			$em->persist($solicitud);
@@ -566,7 +573,7 @@ class DefaultController extends Controller
    					//$campoExtendido->getTipoDato()->getDescripcion();
    					   					
 					if ($campoExtendido->getRequerido() == true){
-					   	if (strlen($datosExtendidos[$campoExtendido->getId()] ) == 0){
+					   	if ((is_array($campoExtendido) == false) || (strlen($datosExtendidos[$campoExtendido->getId()] ) == 0)){
    							$errors[$campoExtendido->getId()] = $campoExtendido->getDescripcion() . " es un dato requerido";
    						}
 					}
