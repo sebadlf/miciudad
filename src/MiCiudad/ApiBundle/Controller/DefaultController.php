@@ -700,6 +700,88 @@ class DefaultController extends Controller
    	}
 
    	/**
+   	 * @Route("/solicitud/{id}", requirements={"id" = "\d+"})
+  	 * @Template("ModeloBundle:Default:index.html.twig")
+   	 * @Method("GET")
+   	 */
+   	public function tipoSolicitudListShow($id)
+   	{
+   		$request = $this->getRequest(); 
+   		
+   		$largoTitulo = $request->query->get("largoTitulo", 0);
+   		$largoDescripcion = $request->query->get("largoDescripcion", 0);
+
+   		$anchoMapaPreview = $request->query->get("anchoMapaPreview", 0);
+   		$altoMapaPreview = $request->query->get("altoMapaPreview", 0);
+   		
+   		$anchoMapaFull = $request->query->get("anchoMapaFull", 0);
+   		$altoMapaFull = $request->query->get("altoMapaFull", 0);
+   		
+   		$anchoImagenPreview = $request->query->get("anchoImagenPreview", 0);
+   		$altoImagenPreview = $request->query->get("altoImagenPreview", 0);
+   		
+   		$anchoImagenFull = $request->query->get("anchoImagenFull", 0);
+   		$altoImagenFull = $request->query->get("altoImagenFull", 0);
+   		
+   		$request = $this->getRequest();
+   		$em = $this->getDoctrine()->getManager();
+   		$repository = $em->getRepository('ModeloBundle:Solicitud');
+   		 
+   		$solicitud = $repository->find($id);
+
+   		$fecha = $solicitud->getFechaInicial();
+   		$fecha = $fecha->format('Y-m-d H:i:s');
+   		
+   		//Obtengo el Mapa desde google
+   		$urlGoogleMaps = "http://maps.google.com/maps/api/staticmap";
+   		$anchoMapa = 640;
+   		$altoMapa = 640;
+   		$latitud = $solicitud->getLatitud();
+   		$longitud = $solicitud->getLongitud();
+
+   		$center = "center=" . $latitud . "," . $longitud;
+   		$size = "&size=" . $anchoMapa . "x" . $altoMapa;
+   		$zoom = "&zoom=16";
+   		$sensor = "&sensor=false";
+   		$markers = "&markers=size:mid|color:red|". $latitud . "," . $longitud;   		
+   		
+   		$urlLamada = $urlGoogleMaps . "?" . $center . $size . $zoom . $markers . $sensor;
+  		
+   		$mapa_file = file_get_contents($urlLamada . "&sensor=false");
+   		   		
+   		$archivoCache =  $latitud . "_" . $longitud . ".png";
+   		
+   		$pathArchivoCache = $this->container->getParameter('directorio.uploads.cache') . "mapa/" . $archivoCache;
+   		
+   		file_put_contents($pathArchivoCache, $mapa_file, true);
+   		 
+   		$report["id"] = $solicitud->getId();
+   		$report["numero_solicitud"] = $solicitud->getNumeroSolicitud();
+   		$report["fecha"] = $fecha;
+   		$report["descripcion"] = $solicitud->getDescripcion();
+   		$report["direccion"] = $solicitud->getDireccion();
+   		
+   		$report["mapa_preview"] = $this->generarThumbnailMapa($solicitud, $anchoMapaPreview, $altoMapaPreview);
+   		$report["mapa_full"] = $this->generarThumbnailMapa($solicitud, $anchoMapaFull, $altoMapaFull);
+   		    		
+   		$report["imagen_preview"] = $this->generarThumbnailSolicitud($solicitud, $anchoImagenPreview, $altoImagenPreview);
+   		$report["imagen_full"] = $this->generarThumbnailSolicitud($solicitud, $anchoImagenFull, $altoImagenFull);
+   		
+   		$report["tipo_solicitud"]["id"] = $solicitud->getTipoSolicitud()->getId();
+   		$report["tipo_solicitud"]["titulo"] = $solicitud->getTipoSolicitud()->getTitulo();
+   		   		
+   		$report["estado"]["id"] = $solicitud->getEstado()->getId();
+   		$report["estado"]["titulo"] = $solicitud->getEstado()->getDescripcion();
+   		 
+   		$serializer = $this->container->get('serializer');
+   		$report = $serializer->serialize($report, 'json');  		
+   		
+   		return new Response($report);
+   		
+   	}
+   	
+   	
+   	/**
    	 * @Route("/solicitud/{tipo}")
    	 * @Template("ModeloBundle:Default:index.html.twig")
    	 * @Method("GET")
@@ -814,6 +896,60 @@ class DefaultController extends Controller
    			$uriArchivosCache = $this->container->getParameter('uri.uploads.cache');
    	
    			$urlArchivoCache = $scheme . "://" . $host . $uriArchivosCache . "solicitud/" . $archivoCache;
+   		}
+   	
+   		return $urlArchivoCache;
+   	}
+   	
+   	private function generarThumbnailMapa(Solicitud $solicitud, $ancho, $alto){
+   	
+   		$id = $solicitud->getId();
+   		$archivo = "mapa/" . $solicitud->getLatitud() . "_" . $solicitud->getLongitud() . ".png";
+   	
+   		$pathArchivo = $this->container->getParameter('directorio.uploads.cache');
+   		$pathArchivo = $pathArchivo . $archivo;
+   	
+   		$archivoCache =  $solicitud->getLatitud() . "_" . $solicitud->getLongitud() . "_" . substr("00000000" . $ancho, -8) . "_" . substr("00000000" . $alto, -8) . ".jpg";
+   	
+   		$pathArchivoCache = $this->container->getParameter('directorio.uploads.cache') . "mapa/" . $archivoCache;
+   	
+   		if (file_exists($pathArchivoCache) == false){
+   			if (file_exists($pathArchivo) == true){
+   	
+   				try {
+   					if (($ancho > 0) && ($alto > 0)){
+   						$imagine = new \Imagine\Gd\Imagine();
+   						$size    = new \Imagine\Image\Box($ancho, $alto);
+   						$mode    = \Imagine\Image\ImageInterface::THUMBNAIL_OUTBOUND;
+   							
+   						$imagenResultado = $imagine->create($size, new \Imagine\Image\Color('000', 100));
+   							
+   						$thumbnail = $imagine->open($pathArchivo)->thumbnail($size, $mode);
+   	
+   						$thumbnail->save($pathArchivoCache);
+   					} else {
+   						$imagine = new \Imagine\Gd\Imagine();
+   						$imagine->open($pathArchivo)->save($pathArchivoCache);
+   					}
+   				} catch (\Imagine\Exception\InvalidArgumentException $ex) {
+   					$archivoCache = null;
+   				}
+   			}
+   			else
+   			{
+   				$archivoCache = null;
+   			}
+   		}
+   	
+   		$urlArchivoCache = "";
+   		if ($archivoCache != null){
+   			$request = $this->getRequest();
+   	
+   			$scheme = $request->getScheme();
+   			$host = $request->getHost();
+   			$uriArchivosCache = $this->container->getParameter('uri.uploads.cache');
+   	
+   			$urlArchivoCache = $scheme . "://" . $host . $uriArchivosCache . "mapa/" . $archivoCache;
    		}
    	
    		return $urlArchivoCache;

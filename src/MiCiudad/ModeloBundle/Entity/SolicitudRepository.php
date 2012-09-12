@@ -38,7 +38,11 @@ class SolicitudRepository extends EntityRepository
 		
 		$qb = $this->inicializarQueryBuilder();
 		
-		$qb->select('s')->from('ModeloBundle:Solicitud', 's')->where('s.dispositivo = :dispositivoId')->setParameter('dispositivoId',  $dispositivoId);
+		$qb->select('s')
+			->from('ModeloBundle:Solicitud', 's')
+			->where('s.dispositivo = :dispositivoId')
+			->orderBy('s.id', 'DESC')
+			->setParameter('dispositivoId',  $dispositivoId);
 		
 		$solicitudes = $this->ejecutarQueryBuilder($qb);
 		

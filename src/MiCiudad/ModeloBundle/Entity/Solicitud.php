@@ -1,6 +1,8 @@
 <?php
 
 namespace MiCiudad\ModeloBundle\Entity;
+use Symfony\Component\Validator\Constraints\Count;
+
 use Doctrine\Common\Collections\ArrayCollection;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -449,4 +451,24 @@ class Solicitud {
 		return $fecha;
 	}
 	
+
+	/**
+	 * Get SolicitudEstado
+	 *
+	 * @return \MiCiudad\ModeloBundle\Entity\SolicitudEstado
+	 */
+	public function getEstado()
+	{
+		$estados = $this->getSolicitudEstados();
+	
+		$estado = null;
+		if (count($estados) > 0){
+			$estado = $estados[count($estados) - 1];
+			
+			$estado = $estado->getEstado();
+		}
+	
+		return $estado;
+		
+	}
 }
