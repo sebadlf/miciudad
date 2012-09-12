@@ -71,7 +71,7 @@ class SolicitudRepository extends EntityRepository
 	
 		$qb->select('s')
 			->from('ModeloBundle:Solicitud', 's')
-			->orderBy('s.id', 'ASC');
+			->orderBy('s.id', 'DESC');
 			
 		$solicitudes = $this->ejecutarQueryBuilder($qb);
 	

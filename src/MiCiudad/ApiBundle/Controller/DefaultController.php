@@ -744,7 +744,7 @@ class DefaultController extends Controller
    			}
    			
    			$report[$i]["id"] = $solicitud->getId();
-   			$report[$i]["numeroSolicitud"] = $solicitud->getNumeroSolicitud();
+   			$report[$i]["numero_solicitud"] = $solicitud->getNumeroSolicitud();
    			$report[$i]["fecha"] = $solicitud->getFechaInicial();
    			$report[$i]["descripcion"] = $descripcion;
    			$report[$i]["direccion"] = $solicitud->getDireccion();
