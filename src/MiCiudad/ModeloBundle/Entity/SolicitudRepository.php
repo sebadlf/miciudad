@@ -2,6 +2,8 @@
 
 namespace MiCiudad\ModeloBundle\Entity;
 
+use Doctrine\ORM\QueryBuilder;
+
 use Doctrine\ORM\EntityRepository;
 
 /**
@@ -12,4 +14,70 @@ use Doctrine\ORM\EntityRepository;
  */
 class SolicitudRepository extends EntityRepository
 {
+	private function inicializarQueryBuilder(){
+		$em = $this->getEntityManager();
+		
+		$qb = $em->createQueryBuilder();
+		
+		$qb->setFirstResult(0);
+		$qb->setMaxResults(30);
+
+		return $qb;
+	}
+	
+	private function ejecutarQueryBuilder(QueryBuilder $qb){
+		$query = $qb->getQuery();
+		
+		$solicitudes  = $query->getResult();
+		
+		return $solicitudes;		
+	}
+	
+	
+	public function findMias($dispositivoId){
+		
+		$qb = $this->inicializarQueryBuilder();
+		
+		$qb->select('s')->from('ModeloBundle:Solicitud', 's')->where('s.dispositivo = :dispositivoId')->setParameter('dispositivoId',  $dispositivoId);
+		
+		$solicitudes = $this->ejecutarQueryBuilder($qb);
+		
+		return $solicitudes;
+	}
+	
+	public function findCercanas($latitud, $longitud){
+	
+		$qb = $this->inicializarQueryBuilder();
+	
+		$qb	->select('s as solicitud', 
+				'sqrt((s.latitud - :latitudActual) * (s.latitud - :latitudActual) + (s.longitud - :longitudActual) * (s.longitud - :longitudActual)) distancia')
+			->from('ModeloBundle:Solicitud', 's')
+			->orderBy('distancia', 'ASC')
+			->setParameter('latitudActual',  $latitud)
+			->setParameter('longitudActual',  $longitud);
+	
+		$result = $this->ejecutarQueryBuilder($qb);
+
+		foreach ($result as $solicitud) {
+			$solicitudes[] = $solicitud["solicitud"];
+		}		
+
+		return $solicitudes;
+	}
+	
+	public function findUltimas(){
+	
+		$qb = $this->inicializarQueryBuilder();
+	
+		$qb->select('s')
+			->from('ModeloBundle:Solicitud', 's')
+			->orderBy('s.id', 'ASC');
+			
+		$solicitudes = $this->ejecutarQueryBuilder($qb);
+	
+		return $solicitudes;
+	}
+	
+	
+	
 }

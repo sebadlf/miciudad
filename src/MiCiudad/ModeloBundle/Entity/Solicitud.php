@@ -432,4 +432,21 @@ class Solicitud {
 		return $this->datosExtendidos;
 	}
 
+	/**
+	 * Get fecha
+	 *
+	 * @return \DateTime
+	 */
+	public function getFechaInicial()
+	{
+		$estados = $this->getSolicitudEstados();
+		
+		$fecha = null;
+		if (count($estados) > 0){
+			$fecha = $estados[0]->getFecha();
+		}
+		
+		return $fecha;
+	}
+	
 }

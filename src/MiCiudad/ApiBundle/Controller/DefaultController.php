@@ -530,7 +530,11 @@ class DefaultController extends Controller
    				mkdir($this->container->getParameter('directorio.uploads') . "solicitud/" . $carpetaFormateada);
    			}
    			
-   			mkdir($this->container->getParameter('directorio.uploads') . "solicitud/" . $carpetaFormateada . "/" . $idFormateado);
+   			if (file_exists($this->container->getParameter('directorio.uploads') . "solicitud/" . $carpetaFormateada . "/" . $idFormateado) == false){
+   				mkdir($this->container->getParameter('directorio.uploads') . "solicitud/" . $carpetaFormateada . "/" . $idFormateado);
+   			}
+   			
+   			
    			$pathFotoDestino = "solicitud/" . $carpetaFormateada . "/" . $idFormateado . "/" . $idFormateado . ".jpg";
   			   			
    			if ($foto != null){
@@ -702,55 +706,113 @@ class DefaultController extends Controller
    	 */
    	public function tipoSolicitudListAction($tipo)
    	{
-   		$em = $this->getDoctrine()->getManager();
-   		$qb = $em->createQueryBuilder();
-   		
    		$request = $this->getRequest();
-   		 
-   		$tiposSolicitudes = $em->getRepository('ModeloBundle:TipoSolicitud')->findBy(array("tipoSolicitudPadre" => null));
-
-   		$largoDescripcion = $request->query->get("largoDescripcion", null);
-   		$anchoImagen = $request->query->get("anchoImagen", null);
-   		$altoImagen = $request->query->get("altoImagen", null);
+   		$em = $this->getDoctrine()->getManager();
+   		$repository = $em->getRepository('ModeloBundle:Solicitud');
+  		 
+   		$largoTitulo = $request->query->get("largoTitulo", 0);
+   		$largoDescripcion = $request->query->get("largoDescripcion", 0);
+   		$anchoImagen = $request->query->get("anchoImagen", 0);
+   		$altoImagen = $request->query->get("altoImagen", 0);
    		
    		$dispositivoId = $request->query->get("dispositivoId", null);
    		
    		$latitud = $request->query->get("latitud", null);
    		$longitud = $request->query->get("longitud", null);
 
-   		
-   		$qb->setFirstResult(0);
-   		$qb->setMaxResults(30);
-   		
-   		$q = $em->createQuery();
+		$solicitudes = array();
    		if ($tipo == "mias"){
-   			$qb->select('s')->from('ModeloBundle:Solicitud', 's')->where('s.dispositivo = :dispositivoId')->setParameter('dispositivoId',  $dispositivoId);
+   			$solicitudes = $repository->findMias($dispositivoId);
    		} else if ($tipo == "cercanas"){
-   			$qb->select('s')->from('ModeloBundle:Solicitud', 's');
+   			$solicitudes = $repository->findCercanas($latitud, $longitud);
    		} else if ($tipo == "ultimas"){
-   			$qb->select('s', 'se')->from('ModeloBundle:Solicitud', 's')
-   							->innerjoin("ModeloBundle:SolicitudEstado", "se")->orderBy('se.fecha', "DESC");
+			$solicitudes = $repository->findUltimas();   			
    		}
-   		   		
-   		$query = $qb->getQuery();
-   		
-   		echo $query->getSql();
-   		 		
-   		
-   		$solicitudes  = $query->getResult();
-   		    		
-   		/*
+
+   		$report = array();
    		$i = 0;
-   		$result = array();
-   		foreach ($tiposSolicitudes as $tipoSolicitud) {
-   			$result[$i] = $this->generarArrayRecursivo($tipoSolicitud, $anchoIcono, $altoIcono, $largoTitulo, $largoDescripcion);
+   		foreach ($solicitudes as $solicitud) {
+
+   			$titulo = $solicitud->getTipoSolicitud()->getTitulo();
+   			if ($largoTitulo > 0){
+   				$titulo = substr($titulo, 0, $largoTitulo);
+   			}
+   			
+   			$descripcion = $solicitud->getDescripcion();
+   			if ($largoDescripcion > 0){
+   				$descripcion = substr($descripcion, 0, $largoDescripcion);
+   			}
+   			
+   			$report[$i]["id"] = $solicitud->getId();
+   			$report[$i]["numeroSolicitud"] = $solicitud->getNumeroSolicitud();
+   			$report[$i]["fecha"] = $solicitud->getFechaInicial();
+   			$report[$i]["descripcion"] = $descripcion;
+   			$report[$i]["direccion"] = $solicitud->getDireccion();
+   			$report[$i]["imagen"] = $this->generarThumbnailSolicitud($solicitud, $anchoImagen, $altoImagen);
+   			$report[$i]["tipoSolicitud"]["id"] = $solicitud->getTipoSolicitud()->getId();
+   			$report[$i]["tipoSolicitud"]["titulo"] = $titulo;
+   			
+   			$i++;
    		}
-   		*/
+   		
    		
    		$serializer = $this->container->get('serializer');
-   		$report = $serializer->serialize($solicitudes, 'json');
+   		$report = $serializer->serialize($report, 'json');
    	
    		return new Response($report);
    	}
    	
+   	private function generarThumbnailSolicitud(Solicitud $solicitud, $ancho, $alto){
+   		 
+   		$id = $solicitud->getId();
+   		$archivo = $solicitud->getFoto();
+   	
+   		$pathArchivo = $this->container->getParameter('directorio.uploads');
+   		$pathArchivo = $pathArchivo . $archivo;
+   		 
+   		$archivoCache = substr("00000000" . $id, -8) . "_FotoUsuario_" . "_" . substr("00000000" . $ancho, -8) . "_" . substr("00000000" . $alto, -8) . ".jpg";
+   		 
+   		$pathArchivoCache = $this->container->getParameter('directorio.uploads.cache') . "solicitud/" . $archivoCache;
+   	
+   		if (file_exists($pathArchivoCache) == false){
+   			if (file_exists($pathArchivo) == true){
+
+   				try {
+	   				if (($ancho > 0) && ($alto > 0)){
+	   					$imagine = new \Imagine\Gd\Imagine();
+	   					$size    = new \Imagine\Image\Box($ancho, $alto);
+	   					$mode    = \Imagine\Image\ImageInterface::THUMBNAIL_OUTBOUND;
+	   					
+	   					$imagenResultado = $imagine->create($size, new \Imagine\Image\Color('000', 100));
+	   					
+	   					$thumbnail = $imagine->open($pathArchivo)->thumbnail($size, $mode);
+	   	  	
+	   					$thumbnail->save($pathArchivoCache);
+	   				} else {
+	   					$imagine = new \Imagine\Gd\Imagine();
+	   					$imagine->open($pathArchivo)->save($pathArchivoCache);
+	   				}
+   				} catch (\Imagine\Exception\InvalidArgumentException $ex) {
+   					$archivoCache = null;
+   				}
+   			}
+   			else
+   			{
+   				$archivoCache = null;
+   			}
+   		}
+   		 
+   		$urlArchivoCache = "";
+   		if ($archivoCache != null){
+   			$request = $this->getRequest();
+   	
+   			$scheme = $request->getScheme();
+   			$host = $request->getHost();
+   			$uriArchivosCache = $this->container->getParameter('uri.uploads.cache');
+   	
+   			$urlArchivoCache = $scheme . "://" . $host . $uriArchivosCache . "solicitud/" . $archivoCache;
+   		}
+   	
+   		return $urlArchivoCache;
+   	}
 }
