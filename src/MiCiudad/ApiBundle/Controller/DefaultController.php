@@ -752,8 +752,8 @@ class DefaultController extends Controller
    			$report[$i]["descripcion"] = $descripcion;
    			$report[$i]["direccion"] = $solicitud->getDireccion();
    			$report[$i]["imagen"] = $this->generarThumbnailSolicitud($solicitud, $anchoImagen, $altoImagen);
-   			$report[$i]["tipoSolicitud"]["id"] = $solicitud->getTipoSolicitud()->getId();
-   			$report[$i]["tipoSolicitud"]["titulo"] = $titulo;
+   			$report[$i]["tipo_solicitud"]["id"] = $solicitud->getTipoSolicitud()->getId();
+   			$report[$i]["tipo_solicitud"]["titulo"] = $titulo;
    			
    			$i++;
    		}
