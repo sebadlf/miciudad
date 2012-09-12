@@ -743,9 +743,12 @@ class DefaultController extends Controller
    				$descripcion = substr($descripcion, 0, $largoDescripcion);
    			}
    			
+   			$fecha = $solicitud->getFechaInicial();
+   			$fecha = $fecha->format('Y-m-d H:i:s');
+   			
    			$report[$i]["id"] = $solicitud->getId();
    			$report[$i]["numero_solicitud"] = $solicitud->getNumeroSolicitud();
-   			$report[$i]["fecha"] = $solicitud->getFechaInicial();
+   			$report[$i]["fecha"] = $fecha;
    			$report[$i]["descripcion"] = $descripcion;
    			$report[$i]["direccion"] = $solicitud->getDireccion();
    			$report[$i]["imagen"] = $this->generarThumbnailSolicitud($solicitud, $anchoImagen, $altoImagen);
@@ -770,7 +773,7 @@ class DefaultController extends Controller
    		$pathArchivo = $this->container->getParameter('directorio.uploads');
    		$pathArchivo = $pathArchivo . $archivo;
    		 
-   		$archivoCache = substr("00000000" . $id, -8) . "_FotoUsuario_" . "_" . substr("00000000" . $ancho, -8) . "_" . substr("00000000" . $alto, -8) . ".jpg";
+   		$archivoCache = substr("00000000" . $id, -8) . "_FotoUsuario_" . substr("00000000" . $ancho, -8) . "_" . substr("00000000" . $alto, -8) . ".jpg";
    		 
    		$pathArchivoCache = $this->container->getParameter('directorio.uploads.cache') . "solicitud/" . $archivoCache;
    	
