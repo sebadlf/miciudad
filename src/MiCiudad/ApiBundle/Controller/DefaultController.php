@@ -773,6 +773,26 @@ class DefaultController extends Controller
    		$report["estado"]["id"] = $solicitud->getEstado()->getId();
    		$report["estado"]["titulo"] = $solicitud->getEstado()->getDescripcion();
    		 
+   		$datosExtendidos = $solicitud->getDatosExtendidos();
+   		$datosExtendidosExport = array();
+   		$i = 0;
+   		if (count($datosExtendidos) > 0){
+			
+   			foreach ($datosExtendidos as $datoExtendidos) {
+   				
+   				$datosExtendidosExport[$i]["id"] = $datoExtendidos->getId();
+   				$datosExtendidosExport[$i]["descripcion"] = $datoExtendidos->getCampoExtendido()->getDescripcion();
+   				$datosExtendidosExport[$i]["valor"] = $datoExtendidos->getValor();
+   				$datosExtendidosExport[$i]["tipo"] = $datoExtendidos->getCampoExtendido()->getTipoDato()->getDescripcion();
+   				
+   				$i++;
+   			}
+   			
+   			
+   			$report["datos_extendidos"] = $datosExtendidosExport;
+   		}
+   		
+   		
    		$serializer = $this->container->get('serializer');
    		$report = $serializer->serialize($report, 'json');  		
    		
