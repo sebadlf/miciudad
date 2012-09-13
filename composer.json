@@ -18,7 +18,8 @@
         "sensio/generator-bundle": "2.1.*",
         "jms/security-extra-bundle": "1.2.*",
         "jms/di-extra-bundle": "1.1.*",
-        "friendsofsymfony/rest-bundle": "*"
+        "friendsofsymfony/rest-bundle": "*",
+        "stof/doctrine-extensions-bundle": "dev-master"
     },
     "scripts": {
         "post-install-cmd": [

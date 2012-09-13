@@ -21,7 +21,8 @@ class AppKernel extends Kernel
             new JMS\SecurityExtraBundle\JMSSecurityExtraBundle(),
         	new JMS\SerializerBundle\JMSSerializerBundle($this),
         	new FOS\RestBundle\FOSRestBundle(),
-            new MiCiudad\ApiBundle\ApiBundle(),
+        	new Stof\DoctrineExtensionsBundle\StofDoctrineExtensionsBundle(),
+        	new MiCiudad\ApiBundle\ApiBundle(),
             new MiCiudad\ModeloBundle\ModeloBundle(),
         );
 

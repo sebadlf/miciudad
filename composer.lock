@@ -1,5 +1,5 @@
 {
-    "hash": "4df0457bd0fd0401b0151b4645d8fad1",
+    "hash": "66fa4d5a25cc08150f099716e058265b",
     "packages": [
         {
             "package": "doctrine/common",
@@ -46,14 +46,14 @@
         {
             "package": "friendsofsymfony/rest-bundle",
             "version": "dev-master",
-            "alias-pretty-version": "0.9.x-dev",
-            "alias-version": "0.9.9999999.9999999-dev"
+            "source-reference": "ee75db5cf924a4fee6c8b5b056c2bc0f81b15964",
+            "commit-date": "1347411334"
         },
         {
-            "package": "friendsofsymfony/rest-bundle",
+            "package": "gedmo/doctrine-extensions",
             "version": "dev-master",
-            "source-reference": "741379ec2c3821664416a50c9274c1005f74160d",
-            "commit-date": "1347345361"
+            "source-reference": "8690cabf9c750fe44a257a8c7e905cdc36931674",
+            "commit-date": "1347372790"
         },
         {
             "package": "jms/aop-bundle",
@@ -100,8 +100,8 @@
         {
             "package": "kriswallsmith/assetic",
             "version": "dev-master",
-            "source-reference": "dfbb776288baf9319d1693195af2cb6e00729901",
-            "commit-date": "1347039484"
+            "source-reference": "63f430864d57674b33c2fd63b2e9a211b604a7f4",
+            "commit-date": "1347539260"
         },
         {
             "package": "monolog/monolog",
@@ -140,6 +140,12 @@
             "commit-date": "1346138171"
         },
         {
+            "package": "stof/doctrine-extensions-bundle",
+            "version": "dev-master",
+            "source-reference": "0247e6f1658d76292c8ffe2c5106090bd36bd799",
+            "commit-date": "1346283670"
+        },
+        {
             "package": "swiftmailer/swiftmailer",
             "version": "dev-master",
             "alias-pretty-version": "4.2.x-dev",
@@ -148,8 +154,8 @@
         {
             "package": "swiftmailer/swiftmailer",
             "version": "dev-master",
-            "source-reference": "c97353b1ebffe25a224146f69d17efe24c093def",
-            "commit-date": "1347083952"
+            "source-reference": "1e5482485f30a2431f9b8eb19a091eef4b57008c",
+            "commit-date": "1347542176"
         },
         {
             "package": "symfony/assetic-bundle",
@@ -160,8 +166,8 @@
         {
             "package": "symfony/assetic-bundle",
             "version": "dev-master",
-            "source-reference": "4e7e8a039fa19434f04558473adbb201118af942",
-            "commit-date": "1346199949"
+            "source-reference": "ca999f55c18b23daf1dc148efe4c42122eb8fd3b",
+            "commit-date": "1347524781"
         },
         {
             "package": "symfony/monolog-bundle",
@@ -214,8 +220,8 @@
         {
             "package": "twig/twig",
             "version": "dev-master",
-            "source-reference": "68b8c4619c5bbe82bd345fe56070dec8c356610a",
-            "commit-date": "1347025342"
+            "source-reference": "956a66e6da304ead2aa2632acc01118b360d19d3",
+            "commit-date": "1347542132"
         }
     ],
     "packages-dev": null,
@@ -223,7 +229,7 @@
 
     ],
     "minimum-stability": "dev",
-    "stability-flags": [
-
-    ]
+    "stability-flags": {
+        "stof/doctrine-extensions-bundle": 20
+    }
 }

@@ -3,6 +3,10 @@
 namespace MiCiudad\ModeloBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
+use Gedmo\Translatable\Translatable;
+
+
 
 /**
  * MiCiudad\ModeloBundle\Entity\TipoSolicitud
@@ -32,6 +36,7 @@ class TipoSolicitud
      * @var string $descripcion
      *
      * @ORM\Column(name="descripcion", type="string", length=1000)
+     * @Gedmo\Translatable
      */
     private $descripcion;
 
@@ -306,4 +311,14 @@ class TipoSolicitud
     public function __ToString(){
     	return $this->getDescripcion();
     }
+    
+    /**
+     * @Gedmo\Locale
+     */
+    private $locale;
+    public function setTranslatableLocale($locale)
+    {
+    	$this->locale = $locale;
+    }
+    
 }

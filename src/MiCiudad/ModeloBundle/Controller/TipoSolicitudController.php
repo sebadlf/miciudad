@@ -37,7 +37,7 @@ class TipoSolicitudController extends Controller
     /**
      * Finds and displays a TipoSolicitud entity.
      *
-     * @Route("/{id}/show", name="tiposolicitud_show")
+     * @Route("{/{id}/show", name="tiposolicitud_show")
      * @Template()
      */
     public function showAction($id)

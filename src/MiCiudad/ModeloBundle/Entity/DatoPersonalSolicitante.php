@@ -63,6 +63,13 @@ class DatoPersonalSolicitante
      */
     private $mascara;
 
+    /**
+     * @var boolean $password
+     *
+     * @ORM\Column(name="password", type="boolean")
+     */
+    private $password;
+    
 
     /**
      * Get id
@@ -189,6 +196,29 @@ class DatoPersonalSolicitante
         return $this->visible;
     }
 
+    /**
+     * Set password
+     *
+     * @param boolean $password
+     * @return DatoPersonalSolicitante
+     */
+    public function setPassword($password)
+    {
+    	$this->password = $password;
+    
+    	return $this;
+    }
+    
+    /**
+     * Get password
+     *
+     * @return boolean
+     */
+    public function getPassword()
+    {
+    	return $this->password;
+    }
+    
     /**
      * Set mascara
      *

@@ -1005,6 +1005,7 @@ class DefaultController extends Controller
    			$datosPersonalesExport[$datoPersonal->getCodigo()]["visible"] = $datoPersonal->getVisible() ? 1 : 0;
    			$datosPersonalesExport[$datoPersonal->getCodigo()]["requerido"] = $datoPersonal->getRequerido() ? 1 : 0;
    			$datosPersonalesExport[$datoPersonal->getCodigo()]["mascara"] = $datoPersonal->getMascara();
+   			$datosPersonalesExport[$datoPersonal->getCodigo()]["password"] = $datoPersonal->getPassword() ? 1 : 0;
    		}
    		
    		$report["rss.enabled"] = $this->container->getParameter('rss.enabled');

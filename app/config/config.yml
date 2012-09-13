@@ -74,6 +74,38 @@ doctrine:
         auto_generate_proxy_classes: %kernel.debug%
         auto_mapping: true
 
+        mappings:
+            gedmo_translatable:
+                type:      annotation
+                prefix:    Gedmo\Translatable\Entity
+                dir:       "%kernel.root_dir%/../vendor/gedmo/doctrine-extensions/lib/Gedmo/Translatable/Entity"
+                is_bundle: false
+                # el alias es opcional, por defecto se utiliza la clave de este mapeo
+                alias:     GedmoTranslatable
+            gedmo_translator:
+                type:      annotation
+                prefix:    Gedmo\Translator\Entity
+                dir:       "%kernel.root_dir%/../vendor/gedmo/doctrine-extensions/lib/Gedmo/Translator/Entity"
+                is_bundle: false
+                # el alias es opcional, por defecto se utiliza la clave de este mapeo
+                alias:     GedmoTranslator
+            gedmo_loggable:
+                type:      annotation
+                prefix:    Gedmo\Loggable\Entity
+                dir:       "%kernel.root_dir%/../vendor/gedmo/doctrine-extensions/lib/Gedmo/Loggable/Entity"
+                is_bundle: false
+                # el alias es opcional, por defecto se utiliza la clave de este mapeo
+                alias:     GedmoLoggable
+            gedmo_tree:
+                type:      annotation
+                prefix:    Gedmo\Tree\Entity
+                dir:       "%kernel.root_dir%/../vendor/gedmo/doctrine-extensions/lib/Gedmo/Tree/Entity"
+                is_bundle: false
+                # el alias es opcional, por defecto se utiliza la clave de este mapeo
+                alias:     GedmoTree
+
+
+
 # Swiftmailer Configuration
 swiftmailer:
     transport: %mailer_transport%
@@ -106,3 +138,13 @@ fos_rest:
         templating: templating
         serializer: serializer
         view_handler: fos_rest.view_handler.default     
+        
+        
+stof_doctrine_extensions:
+    default_locale: es
+    translation_fallback: true
+    orm:
+        default:
+            translatable: true
+     
+        
