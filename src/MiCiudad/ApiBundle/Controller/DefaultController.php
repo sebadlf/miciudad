@@ -974,4 +974,50 @@ class DefaultController extends Controller
    	
    		return $urlArchivoCache;
    	}
+   	
+   	/**
+   	 * @Route("/parametro")
+   	 * @Template("ModeloBundle:Default:index.html.twig")
+   	 * @Method("GET")
+   	 */
+   	public function parametrosAction()
+   	{
+   		$request = $this->getRequest();
+   		$em = $this->getDoctrine()->getManager();
+   		$repositoryDatosPersonales = $em->getRepository('ModeloBundle:DatoPersonalSolicitante');
+   			
+   		$datosPersonales = $repositoryDatosPersonales->findAll();
+   		
+   		$datosPersonalesExport = array();
+   		foreach ($datosPersonales as $datoPersonal) {
+   			$datosPersonalesExport[$datoPersonal->getCodigo()]["descripcion"] = $datoPersonal->getDescripcion();
+   			$datosPersonalesExport[$datoPersonal->getCodigo()]["visible"] = $datoPersonal->getVisible() ? 1 : 0;
+   			$datosPersonalesExport[$datoPersonal->getCodigo()]["requerido"] = $datoPersonal->getRequerido() ? 1 : 0;
+   			$datosPersonalesExport[$datoPersonal->getCodigo()]["mascara"] = $datoPersonal->getMascara();
+   		}
+   		
+   		$report["rss.enabled"] = $this->container->getParameter('rss.enabled');
+   		$report["rss.urlNoticias"] = $this->container->getParameter('rss.urlNoticias');
+   		$report["rss.urlAlertas"] = $this->container->getParameter('rss.urlAlertas');
+   		
+   		$report["solicitud.solicitanteRequerido"] = $this->container->getParameter('solicitud.solicitanteRequerido');
+   		$report["solicitud.foto.obligatoria"] = $this->container->getParameter('solicitud.foto.obligatoria');
+   		$report["solicitud.foto.anchoMaximo"] = $this->container->getParameter('solicitud.foto.anchoMaximo');
+   		$report["solicitud.foto.altoMaximo"] = $this->container->getParameter('solicitud.foto.altoMaximo');
+   		$report["solicitud.foto.calidad"] = $this->container->getParameter('solicitud.foto.calidad');
+   		
+   		$report["localizacion.codigoMoneda"] = $this->container->getParameter('localizacion.codigoMoneda');
+   		$report["localizacion.pais"] = $this->container->getParameter('localizacion.pais');
+   		$report["localizacion.ciudad"] = $this->container->getParameter('localizacion.ciudad');
+   		
+   		$report["mobile.colorBarraSuperior"] = "#" . $this->container->getParameter('mobile.colorBarraSuperior');
+
+   		$report["datos_personales"] = $datosPersonalesExport;
+   		
+   		$serializer = $this->container->get('serializer');
+   		$report = $serializer->serialize($report, 'json');
+   		
+   		return new Response($report);
+   	}   	
+   	
 }

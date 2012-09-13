@@ -8,6 +8,24 @@ parameters:
     directorio.uploads: %kernel.root_dir%/../web/uploads/
     directorio.uploads.cache: %kernel.root_dir%/../web/uploads/cache/
 
+    rss.enabled: 1
+    rss.urlNoticias: http://wordpress.miciudad.rollpix.com/?cat=noticias&feed=rss2
+    rss.urlAlertas: http://wordpress.miciudad.rollpix.com/?cat=noticias&feed=rss2
+    
+    solicitud.solicitanteRequerido: 1
+    solicitud.foto.obligatoria: 1
+    solicitud.foto.anchoMaximo: 800
+    solicitud.foto.altoMaximo: 600
+    solicitud.foto.calidad: 90
+    
+    solicitud.cantidadMostrada: 20 #Cantidad de solicitudes devueltas por la api
+    
+    localizacion.codigoMoneda: $
+    localizacion.pais: argentina
+    localizacion.ciudad: mar del plata
+    
+    mobile.colorBarraSuperior: 4B72B7 #ej: #FFFFFF
+
 framework:
     #esi:             ~
     #translator:      { fallback: %locale% }
