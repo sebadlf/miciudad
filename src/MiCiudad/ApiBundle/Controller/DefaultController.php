@@ -783,16 +783,18 @@ class DefaultController extends Controller
    				$datosExtendidosExport[$i]["id"] = $datoExtendidos->getId();
    				$datosExtendidosExport[$i]["descripcion"] = $datoExtendidos->getCampoExtendido()->getDescripcion();
    				
-   				if ($datoExtendidos->getCampoExtendido()->getDescripcion() != "Radio"){
+   				if ($datoExtendidos->getCampoExtendido()->getTipoControl()->getDescripcion() != "Radio"){
    					$datosExtendidosExport[$i]["valor"] = $datoExtendidos->getValor();
+   					$datosExtendidosExport[$i]["tipo"] = "String";
    				} else {
    					$opcion = $em->getRepository('ModeloBundle:CampoExtendidoOpcion')->find($datoExtendidos->getValor());
    					
    					$datosExtendidosExport[$i]["valor"] = $opcion->getDescripcion();
+   					$datosExtendidosExport[$i]["tipo"] = $datoExtendidos->getCampoExtendido()->getTipoDato()->getDescripcion();
    				}
    				
    				
-   				$datosExtendidosExport[$i]["tipo"] = $datoExtendidos->getCampoExtendido()->getTipoDato()->getDescripcion();
+   				
    				
    				$i++;
    			}
