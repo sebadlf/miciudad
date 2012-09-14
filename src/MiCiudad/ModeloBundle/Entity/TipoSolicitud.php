@@ -321,4 +321,8 @@ class TipoSolicitud
     	$this->locale = $locale;
     }
     
+    public function getLocale(){
+    	return $this->locale;
+    }
+    
 }

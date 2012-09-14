@@ -1,12 +1,12 @@
-modelo:
-    resource: "@ModeloBundle/Controller/"
-    type:     annotation
-    prefix:   /
-
 api:
     resource: "@ApiBundle/Controller/"
     type:     annotation
     prefix:   /api
+
+modelo:
+    resource: "@ModeloBundle/Controller/"
+    type:     annotation
+    prefix:   /
 
 # Internal routing configuration to handle ESI
 #_internal:

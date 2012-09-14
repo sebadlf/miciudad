@@ -41,6 +41,9 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 
+use Gedmo\Mapping\Annotation as Gedmo;
+use Gedmo\Translatable\Translatable;
+
 /*
  * @Type("Rest")
  * 
@@ -110,6 +113,8 @@ class DefaultController extends Controller
      */
     public function dispositivoAction()
     {
+    	$this->container->get('stof_doctrine_extensions.listener.translatable')->setTranslatableLocale($this->getRequest()->getPreferredLanguage());
+    	
     	$dispositivosAceptados = array(
     									"AndroidTelefono" => "AndroidTelefono",
     									"AndroidTablet" => "AndroidTablet",
@@ -168,10 +173,17 @@ class DefaultController extends Controller
      */
     public function tipoSolicitudAction()
     {
+    	$this->container->get('stof_doctrine_extensions.listener.translatable')->setTranslatableLocale($this->getRequest()->getPreferredLanguage());
+    	
+    	$request = $this->getRequest();
+    	
+    	//$this->getRequest()->setLocale($this->getRequest()->getPreferredLanguage());
+    	
+    	//echo $this->getRequest()->getLocale();
+    	//die;
+  	
         $em = $this->getDoctrine()->getManager();
-        
-        $request = $this->getRequest();
-       
+               
         $tiposSolicitudes = $em->getRepository('ModeloBundle:TipoSolicitud')->findBy(array("tipoSolicitudPadre" => null));
         
         $anchoIcono = $request->query->get("anchoIcono", 0);
@@ -182,6 +194,7 @@ class DefaultController extends Controller
         $i = 0;
         $result = array();
         foreach ($tiposSolicitudes as $tipoSolicitud) {
+        	
         	$result[$i] = $this->generarArrayRecursivo($tipoSolicitud, $anchoIcono, $altoIcono, $largoTitulo, $largoDescripcion);
         }
         
@@ -324,6 +337,8 @@ class DefaultController extends Controller
    	 */
    	public function tipoSolicitudUltimaActualizacionAction()
    	{
+   		$this->container->get('stof_doctrine_extensions.listener.translatable')->setTranslatableLocale($this->getRequest()->getPreferredLanguage());
+   		
    		$request = $this->getRequest();
    		
    		$errors = null;
@@ -402,6 +417,8 @@ class DefaultController extends Controller
    	 */
    	public function solicitudAction()
    	{
+   		$this->container->get('stof_doctrine_extensions.listener.translatable')->setTranslatableLocale($this->getRequest()->getPreferredLanguage());
+   		
 		$errors = $this->validarVacios(array ('tipoSolicitudId', 'descripcion', 'direccion', 'direccionValidada', 'dispositivoId', 'idioma'));
 		$errors_datosPersonales = array();
 				
@@ -819,6 +836,8 @@ class DefaultController extends Controller
    	 */
    	public function tipoSolicitudListAction($tipo)
    	{
+   		$this->container->get('stof_doctrine_extensions.listener.translatable')->setTranslatableLocale($this->getRequest()->getPreferredLanguage());
+   		
    		$request = $this->getRequest();
    		$em = $this->getDoctrine()->getManager();
    		$repository = $em->getRepository('ModeloBundle:Solicitud');
@@ -993,6 +1012,8 @@ class DefaultController extends Controller
    	 */
    	public function parametrosAction()
    	{
+   		$this->container->get('stof_doctrine_extensions.listener.translatable')->setTranslatableLocale($this->getRequest()->getPreferredLanguage());
+   		
    		$request = $this->getRequest();
    		$em = $this->getDoctrine()->getManager();
    		$repositoryDatosPersonales = $em->getRepository('ModeloBundle:DatoPersonalSolicitante');

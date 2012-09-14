@@ -13,7 +13,7 @@ use MiCiudad\ModeloBundle\Form\TipoSolicitudType;
 /**
  * TipoSolicitud controller.
  *
- * @Route("/tiposolicitud")
+ * @Route("/{_locale}/tiposolicitud/")
  */
 class TipoSolicitudController extends Controller
 {
