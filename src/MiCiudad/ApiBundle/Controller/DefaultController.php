@@ -228,58 +228,23 @@ class DefaultController extends Controller
    	
    	private function generarThumbnailTipoSolicitud(TipoSolicitud $tipoSolicitud, $ancho, $alto){
    		
-   		$id = $tipoSolicitud->getId();
-   		$archivo = $tipoSolicitud->getIcono();
-
-   		$pathArchivo = $this->container->getParameter('directorio.uploads');
-   		$pathArchivo = $pathArchivo . $archivo;
+   		$result = null;
+   		$icono = $tipoSolicitud->getIcono();
    		
-   		$archivoCache = substr("00000000" . $id, -8) . "_" . substr("00000000" . $ancho, -8) . "_" . substr("00000000" . $alto, -8) . ".png";
-   		
-   		$pathArchivoCache = $this->container->getParameter('directorio.uploads.cache') . "tiposolicitud/" . $archivoCache;
-
-   		if (file_exists($pathArchivoCache) == false){
-   			if (file_exists($pathArchivo) == true){
-   				
-   				if (($ancho > 0) && ($alto > 0)){
-   					$imagine = new \Imagine\Gd\Imagine();
-   					$size    = new \Imagine\Image\Box($ancho, $alto);
-   					$mode    = \Imagine\Image\ImageInterface::THUMBNAIL_INSET;
-   					
-   					$imagenResultado = $imagine->create($size, new \Imagine\Image\Color('000', 100));
-   					
-   					$thumbnail = $imagine->open($pathArchivo)->thumbnail($size, $mode);
-   					
-   					$offsetX = (int)(($ancho - $thumbnail->getSize()->getWidth()) / 2);
-   					$offsetY = (int)(($alto - $thumbnail->getSize()->getHeight()) / 2);
-   					
-   					$imagenResultado->paste($thumbnail, new \Imagine\Image\Point($offsetX, $offsetY));   					
-   					
-   					$imagenResultado->save($pathArchivoCache);
-   				} else {
-   					$imagine = new \Imagine\Gd\Imagine();
-   					$imagine->open($pathArchivo)->save($pathArchivoCache);
-   				}
-   				
-   			}
-   			else
-   			{
-   				$archivoCache = null;
-   			}
-   		}
-   		
-   		$urlArchivoCache = "";
-   		if ($archivoCache != null){
-   			$request = $this->getRequest();
+   		if (empty($icono) == false){
+   			$uri = $tipoSolicitud->getId();
+   			$uri .= "/" . base64_encode($tipoSolicitud->getIcono());
+   			$uri .= "/" . $ancho;
+   			$uri .= "/" . $alto;
    			
+   			$request = $this->getRequest();
    			$scheme = $request->getScheme();
    			$host = $request->getHost();
-   			$uriArchivosCache = $this->container->getParameter('uri.uploads.cache');
    			
-   			$urlArchivoCache = $scheme . "://" . $host . $uriArchivosCache . "tiposolicitud/" . $archivoCache;     			
+   			$result = $scheme . "://" . $host . "/api/imagen/tiposolicitud/" . $uri;
    		}
-
-   		return $urlArchivoCache;
+		
+   		return $result;
    	}
    	
    	private function generarDatosExtendidos(TipoSolicitud $tipoSolicitud){
@@ -1052,5 +1017,7 @@ class DefaultController extends Controller
    		
    		return new Response($report);
    	}   	
+
+
    	
 }
