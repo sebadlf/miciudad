@@ -211,7 +211,7 @@ class DefaultController extends Controller
    		$result["id"] = $tipoSolicitud->getId();
    		$result["titulo"] = ($largoTitulo > 0) ? substr($tipoSolicitud->getTitulo(), 0, $largoTitulo) : $tipoSolicitud->getTitulo();
    		$result["descripcion"] = ($largoDescripcion > 0) ? substr($tipoSolicitud->getDescripcion(), 0, $largoDescripcion) : $tipoSolicitud->getDescripcion();
-   		$result["icono"] = $this->obtenerUrlTipoSolicitud($tipoSolicitud, $anchoIcono, $altoIcono);
+   		$result["icono"] = $this->obtenerUrlThumbnailTipoSolicitud($tipoSolicitud, $anchoIcono, $altoIcono);
    		if (count($tipoSolicitudHijas) == 0){
 			$result["datos_extendidos"] = $this->generarDatosExtendidos($tipoSolicitud);
 			$result["tipo_solicitud_hijas"] = array();
