@@ -25,6 +25,8 @@ parameters:
     localizacion.ciudad: mar del plata
     
     mobile.colorBarraSuperior: 4B72B7 #ej: #FFFFFF
+    
+    
 
 framework:
     #esi:             ~
