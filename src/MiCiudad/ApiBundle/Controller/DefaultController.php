@@ -211,7 +211,7 @@ class DefaultController extends Controller
    		$result["id"] = $tipoSolicitud->getId();
    		$result["titulo"] = ($largoTitulo > 0) ? substr($tipoSolicitud->getTitulo(), 0, $largoTitulo) : $tipoSolicitud->getTitulo();
    		$result["descripcion"] = ($largoDescripcion > 0) ? substr($tipoSolicitud->getDescripcion(), 0, $largoDescripcion) : $tipoSolicitud->getDescripcion();
-   		$result["icono"] = $this->generarThumbnailTipoSolicitud($tipoSolicitud, $anchoIcono, $altoIcono);
+   		$result["icono"] = $this->obtenerUrlTipoSolicitud($tipoSolicitud, $anchoIcono, $altoIcono);
    		if (count($tipoSolicitudHijas) == 0){
 			$result["datos_extendidos"] = $this->generarDatosExtendidos($tipoSolicitud);
 			$result["tipo_solicitud_hijas"] = array();
@@ -226,7 +226,7 @@ class DefaultController extends Controller
    		return $result;
    	}
    	
-   	private function generarThumbnailTipoSolicitud(TipoSolicitud $tipoSolicitud, $ancho, $alto){
+   	private function obtenerUrlThumbnailTipoSolicitud(TipoSolicitud $tipoSolicitud, $ancho, $alto){
    		
    		$result = null;
    		$icono = $tipoSolicitud->getIcono();
@@ -713,41 +713,18 @@ class DefaultController extends Controller
 
    		$fecha = $solicitud->getFechaInicial();
    		$fecha = $fecha->format('Y-m-d H:i:s');
-   		
-   		//Obtengo el Mapa desde google
-   		$urlGoogleMaps = "http://maps.google.com/maps/api/staticmap";
-   		$anchoMapa = 640;
-   		$altoMapa = 640;
-   		$latitud = $solicitud->getLatitud();
-   		$longitud = $solicitud->getLongitud();
 
-   		$center = "center=" . $latitud . "," . $longitud;
-   		$size = "&size=" . $anchoMapa . "x" . $altoMapa;
-   		$zoom = "&zoom=16";
-   		$sensor = "&sensor=false";
-   		$markers = "&markers=size:mid|color:red|". $latitud . "," . $longitud;   		
-   		
-   		$urlLamada = $urlGoogleMaps . "?" . $center . $size . $zoom . $markers . $sensor;
-  		
-   		$mapa_file = file_get_contents($urlLamada . "&sensor=false");
-   		   		
-   		$archivoCache =  $latitud . "_" . $longitud . ".png";
-   		
-   		$pathArchivoCache = $this->container->getParameter('directorio.uploads.cache') . "mapa/" . $archivoCache;
-   		
-   		file_put_contents($pathArchivoCache, $mapa_file, true);
-   		 
    		$report["id"] = $solicitud->getId();
    		$report["numero_solicitud"] = $solicitud->getNumeroSolicitud();
    		$report["fecha"] = $fecha;
    		$report["descripcion"] = $solicitud->getDescripcion();
    		$report["direccion"] = $solicitud->getDireccion();
    		
-   		$report["mapa_preview"] = $this->generarThumbnailMapa($solicitud, $anchoMapaPreview, $altoMapaPreview);
-   		$report["mapa_full"] = $this->generarThumbnailMapa($solicitud, $anchoMapaFull, $altoMapaFull);
+   		$report["mapa_preview"] = $this->obtenerUrlThumbnailMapa($solicitud, $anchoMapaPreview, $altoMapaPreview, false);
+   		$report["mapa_full"] = $this->obtenerUrlThumbnailMapa($solicitud, $anchoMapaFull, $altoMapaFull, true);
    		    		
-   		$report["imagen_preview"] = $this->generarThumbnailSolicitud($solicitud, $anchoImagenPreview, $altoImagenPreview);
-   		$report["imagen_full"] = $this->generarThumbnailSolicitud($solicitud, $anchoImagenFull, $altoImagenFull);
+   		$report["imagen_preview"] = $this->obtenerUrlThumbnailSolicitud($solicitud, $anchoImagenPreview, $altoImagenPreview, false);
+   		$report["imagen_full"] = $this->obtenerUrlThumbnailSolicitud($solicitud, $anchoImagenFull, $altoImagenFull, true);
    		
    		$report["tipo_solicitud"]["id"] = $solicitud->getTipoSolicitud()->getId();
    		$report["tipo_solicitud"]["titulo"] = $solicitud->getTipoSolicitud()->getTitulo();
@@ -848,7 +825,7 @@ class DefaultController extends Controller
    			$report[$i]["fecha"] = $fecha;
    			$report[$i]["descripcion"] = $descripcion;
    			$report[$i]["direccion"] = $solicitud->getDireccion();
-   			$report[$i]["imagen"] = $this->generarThumbnailSolicitud($solicitud, $anchoImagen, $altoImagen);
+   			$report[$i]["imagen"] = $this->obtenerUrlThumbnailSolicitud($solicitud, $anchoImagen, $altoImagen, false);
    			$report[$i]["tipo_solicitud"]["id"] = $solicitud->getTipoSolicitud()->getId();
    			$report[$i]["tipo_solicitud"]["titulo"] = $titulo;
    			
@@ -862,112 +839,54 @@ class DefaultController extends Controller
    		return new Response($report);
    	}
    	
-   	private function generarThumbnailSolicitud(Solicitud $solicitud, $ancho, $alto){
+   	private function obtenerUrlThumbnailSolicitud(Solicitud $solicitud, $ancho, $alto, $autoRotar){
    		 
-   		$id = $solicitud->getId();
-   		$archivo = $solicitud->getFoto();
+   		$result = "";
+   		$foto = $solicitud->getFoto();
+   		 
+   		if (empty($icono) == false){
+   			$uri = $solicitud->getId();
+   			$uri .= "/" . base64_encode($tipoSolicitud->getIcono());
+   			$uri .= "/" . $ancho;
+   			$uri .= "/" . $alto;
+   			$uri .= "/" . $autoRotar;
    	
-   		$pathArchivo = $this->container->getParameter('directorio.uploads');
-   		$pathArchivo = $pathArchivo . $archivo;
-   		 
-   		$archivoCache = substr("00000000" . $id, -8) . "_FotoUsuario_" . substr("00000000" . $ancho, -8) . "_" . substr("00000000" . $alto, -8) . ".jpg";
-   		 
-   		$pathArchivoCache = $this->container->getParameter('directorio.uploads.cache') . "solicitud/" . $archivoCache;
-   	
-   		if (file_exists($pathArchivoCache) == false){
-   			if (file_exists($pathArchivo) == true){
-
-   				try {
-	   				if (($ancho > 0) && ($alto > 0)){
-	   					$imagine = new \Imagine\Gd\Imagine();
-	   					$size    = new \Imagine\Image\Box($ancho, $alto);
-	   					$mode    = \Imagine\Image\ImageInterface::THUMBNAIL_OUTBOUND;
-	   					
-	   					$imagenResultado = $imagine->create($size, new \Imagine\Image\Color('000', 100));
-	   					
-	   					$thumbnail = $imagine->open($pathArchivo)->thumbnail($size, $mode);
-	   	  	
-	   					$thumbnail->save($pathArchivoCache);
-	   				} else {
-	   					$imagine = new \Imagine\Gd\Imagine();
-	   					$imagine->open($pathArchivo)->save($pathArchivoCache);
-	   				}
-   				} catch (\Imagine\Exception\InvalidArgumentException $ex) {
-   					$archivoCache = null;
-   				}
-   			}
-   			else
-   			{
-   				$archivoCache = null;
-   			}
-   		}
-   		 
-   		$urlArchivoCache = "";
-   		if ($archivoCache != null){
    			$request = $this->getRequest();
-   	
    			$scheme = $request->getScheme();
    			$host = $request->getHost();
-   			$uriArchivosCache = $this->container->getParameter('uri.uploads.cache');
    	
-   			$urlArchivoCache = $scheme . "://" . $host . $uriArchivosCache . "solicitud/" . $archivoCache;
+   			$result = $scheme . "://" . $host . "/api/imagen/solicitud/foto/" . $uri;
    		}
    	
-   		return $urlArchivoCache;
+   		return $result;
+   		
    	}
    	
-   	private function generarThumbnailMapa(Solicitud $solicitud, $ancho, $alto){
+   	private function obtenerUrlThumbnailMapa(Solicitud $solicitud, $ancho, $alto, $autoRotar){
    	
-   		$id = $solicitud->getId();
-   		$archivo = "mapa/" . $solicitud->getLatitud() . "_" . $solicitud->getLongitud() . ".png";
-   	
-   		$pathArchivo = $this->container->getParameter('directorio.uploads.cache');
-   		$pathArchivo = $pathArchivo . $archivo;
-   	
-   		$archivoCache =  $solicitud->getLatitud() . "_" . $solicitud->getLongitud() . "_" . substr("00000000" . $ancho, -8) . "_" . substr("00000000" . $alto, -8) . ".jpg";
-   	
-   		$pathArchivoCache = $this->container->getParameter('directorio.uploads.cache') . "mapa/" . $archivoCache;
-   	
-   		if (file_exists($pathArchivoCache) == false){
-   			if (file_exists($pathArchivo) == true){
-   	
-   				try {
-   					if (($ancho > 0) && ($alto > 0)){
-   						$imagine = new \Imagine\Gd\Imagine();
-   						$size    = new \Imagine\Image\Box($ancho, $alto);
-   						$mode    = \Imagine\Image\ImageInterface::THUMBNAIL_OUTBOUND;
-   							
-   						$imagenResultado = $imagine->create($size, new \Imagine\Image\Color('000', 100));
-   							
-   						$thumbnail = $imagine->open($pathArchivo)->thumbnail($size, $mode);
-   	
-   						$thumbnail->save($pathArchivoCache);
-   					} else {
-   						$imagine = new \Imagine\Gd\Imagine();
-   						$imagine->open($pathArchivo)->save($pathArchivoCache);
-   					}
-   				} catch (\Imagine\Exception\InvalidArgumentException $ex) {
-   					$archivoCache = null;
-   				}
-   			}
-   			else
-   			{
-   				$archivoCache = null;
-   			}
-   		}
-   	
-   		$urlArchivoCache = "";
-   		if ($archivoCache != null){
+   		$result = "";
+   		$foto = $solicitud->getFoto();
+   		
+   		$latitud = $solicitud->getLatitud();
+   		$longitud = $solicitud->getLongitud();
+   		
+   		
+   		if ((empty($latitud) == false) && (empty($longitud) == false)){
+   			$uri = $solicitud->getId();
+   			$uri .= "/" . $latitud;
+   			$uri .= "/" . $longitud;
+   			$uri .= "/" . $ancho;
+   			$uri .= "/" . $alto;
+   			$uri .= "/" . (($autoRotar == true) ?  1 : 0);
+   		
    			$request = $this->getRequest();
-   	
    			$scheme = $request->getScheme();
    			$host = $request->getHost();
-   			$uriArchivosCache = $this->container->getParameter('uri.uploads.cache');
-   	
-   			$urlArchivoCache = $scheme . "://" . $host . $uriArchivosCache . "mapa/" . $archivoCache;
+   		
+   			$result = $scheme . "://" . $host . "/api/imagen/solicitud/mapa/" . $uri;
    		}
-   	
-   		return $urlArchivoCache;
+   		
+   		return $result;
    	}
    	
    	/**
