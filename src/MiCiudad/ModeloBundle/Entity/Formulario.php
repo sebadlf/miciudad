@@ -3,6 +3,8 @@
 namespace MiCiudad\ModeloBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
+use Gedmo\Translatable\Translatable;
 
 /**
  * MiCiudad\ModeloBundle\Entity\Formulario
@@ -25,6 +27,7 @@ class Formulario
      * @var string $descripcion
      *
      * @ORM\Column(name="descripcion", type="string", length=255)
+     * @Gedmo\Translatable
      */
     private $descripcion;
 

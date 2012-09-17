@@ -107,12 +107,17 @@ class ImagenController extends Controller
 	 */
 	public function tiposolicitudFotoAction($tiposolicitudId, $origen, $ancho, $alto)
 	{
+		$logger = $this->get('logger');
+		$logger->info("/imagen/tiposolicitud/$tiposolicitudId, $origen, $ancho, $alto - Inicio");
+		
 		$origen = base64_decode($origen);
 		$destino = substr("00000000" . $tiposolicitudId, -8) . "_" . substr("00000000" . $ancho, -8) . "_" . substr("00000000" . $alto, -8) . ".png";
 		
 		$origen = $this->container->getParameter('directorio.uploads') . $origen;
 		$destino = $this->container->getParameter('directorio.uploads.cache') . "tiposolicitud/" . $destino;
 		
+		$logger->info("/imagen/tiposolicitud/$tiposolicitudId, $origen, $ancho, $alto - Fin");
+
 		return new Response($this->generarImagen($origen, $destino, $ancho, $alto, true, true, false), 200, array("Content-Type: image/png"));
 	}
 	
@@ -122,12 +127,18 @@ class ImagenController extends Controller
 	 * @Template()
 	 */
 	public function solicitudFotoAction($solicitudId, $origen, $ancho, $alto, $autoRotar){
-	
+
+		$logger = $this->get('logger');
+		$logger->info("/imagen/solicitud/foto/$solicitudId, $origen, $ancho, $alto, $autoRotar - Inicio");
+		
+		
 		$origen = base64_decode($origen);
 		$destino = substr("00000000" . $solicitudId, -8) . "_FotoUsuario_" . substr("00000000" . $ancho, -8) . "_" . substr("00000000" . $alto, -8) . "_" . $autoRotar . ".jpg";
 		
 		$origen = $this->container->getParameter('directorio.uploads') . $origen;
 		$destino = $this->container->getParameter('directorio.uploads.cache') . "solicitud/" . $destino;
+		
+		$logger->info("/imagen/solicitud/foto/$solicitudId, $origen, $ancho, $alto, $autoRotar - Fin");
 		
 		return new Response($this->generarImagen($origen, $destino, $ancho, $alto, false, false, $autoRotar), 200, array("Content-Type: image/png"));
 	}
@@ -139,6 +150,9 @@ class ImagenController extends Controller
 	 */
 	public function solicitudMapaAction($solicitudId, $latitud, $longitud, $ancho, $alto, $autoRotar){
 
+		$logger = $this->get('logger');
+		$logger->info("/imagen/solicitud/mapa/$solicitudId, $latitud, $longitud, $ancho, $alto, $autoRotar - Inicio");
+		
 		$origen = $latitud . "_" . $longitud . ".png";
 		$destino = $latitud . "_" . $longitud . "_" . substr("00000000" . $ancho, -8) . "_" . substr("00000000" . $alto, -8) . "_". $autoRotar .".jpg";
 		
@@ -164,6 +178,8 @@ class ImagenController extends Controller
 			
 			file_put_contents($origen, $mapa_file, true);
 		}
+		
+		$logger->info("/imagen/solicitud/mapa/$solicitudId, $latitud, $longitud, $ancho, $alto, $autoRotar - Fin");
 		
 		return new Response($this->generarImagen($origen, $destino, $ancho, $alto, false, false, $autoRotar), 200, array("Content-Type: image/png"));
 	}

@@ -173,6 +173,9 @@ class DefaultController extends Controller
      */
     public function tipoSolicitudAction()
     {
+    	$logger = $this->get('logger');
+    	$logger->info('/tiposolicitud - Inicio');
+    	
     	$this->container->get('stof_doctrine_extensions.listener.translatable')->setTranslatableLocale($this->getRequest()->getPreferredLanguage());
     	
     	$request = $this->getRequest();
@@ -200,7 +203,9 @@ class DefaultController extends Controller
         
         $serializer = $this->container->get('serializer');
         $report = $serializer->serialize($result, 'json');
-                
+
+        $logger->info('/tiposolicitud - Fin');
+        
         return new Response($report);	
     }
     
@@ -659,8 +664,11 @@ class DefaultController extends Controller
   	 * @Template("ModeloBundle:Default:index.html.twig")
    	 * @Method("GET")
    	 */
-   	public function tipoSolicitudListShow($id)
+   	public function solicitudListShow($id)
    	{
+   		$logger = $this->get('logger');
+   		$logger->info("/solicitud/$id - Inicio");
+   		
    		$request = $this->getRequest(); 
    		
    		$largoTitulo = $request->query->get("largoTitulo", 0);
@@ -739,8 +747,9 @@ class DefaultController extends Controller
    		$serializer = $this->container->get('serializer');
    		$report = $serializer->serialize($report, 'json');  		
    		
-   		return new Response($report);
+   		$logger->info("/solicitud/$id - Fin");
    		
+   		return new Response($report);
    	}
    	
    	
@@ -751,6 +760,9 @@ class DefaultController extends Controller
    	 */
    	public function tipoSolicitudListAction($tipo)
    	{
+   		$logger = $this->get('logger');
+   		$logger->info("/solicitud/$tipo - Inicio");
+   		
    		$this->container->get('stof_doctrine_extensions.listener.translatable')->setTranslatableLocale($this->getRequest()->getPreferredLanguage());
    		
    		$request = $this->getRequest();
@@ -809,6 +821,8 @@ class DefaultController extends Controller
    		$serializer = $this->container->get('serializer');
    		$report = $serializer->serialize($report, 'json');
    	
+   		$logger->info("/solicitud/$tipo - Fin");
+   		
    		return new Response($report);
    	}
    	

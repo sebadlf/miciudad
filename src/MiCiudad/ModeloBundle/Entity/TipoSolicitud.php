@@ -5,6 +5,9 @@ namespace MiCiudad\ModeloBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Translatable\Translatable;
+use Gedmo\Timestampable\Timestampable;
+
+
 
 
 
@@ -73,6 +76,7 @@ class TipoSolicitud
      * @var string $area
      *
      * @ORM\ManyToOne(targetEntity="MiCiudad\ModeloBundle\Entity\Area")
+     * @ORM\JoinColumn(name="area_id", referencedColumnName="id", nullable=false)
      */
     private $area;
 
@@ -80,6 +84,7 @@ class TipoSolicitud
      * @var string $mapa
      *
      * @ORM\ManyToOne(targetEntity="MiCiudad\ModeloBundle\Entity\Mapa")
+     * @ORM\JoinColumn(name="mapa_id", referencedColumnName="id", nullable=false)
      */
     private $mapa;
 
@@ -87,6 +92,7 @@ class TipoSolicitud
      * @var \DateTime $fechaUltimaActualizacion
      *
      * @ORM\Column(name="fechaUltimaActualizacion", type="datetime")
+     * @Gedmo\Timestampable 
      */
     private $fechaUltimaActualizacion;
     

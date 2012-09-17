@@ -5,6 +5,8 @@ namespace MiCiudad\ModeloBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
+use Gedmo\Translatable\Translatable;
 
 /**
  * MiCiudad\ModeloBundle\Entity\CampoExtendido
@@ -27,6 +29,7 @@ class CampoExtendido
      * @var string $descripcion
      *
      * @ORM\Column(name="descripcion", type="string", length=255)
+     * @Gedmo\Translatable
      */
     private $descripcion;
 
