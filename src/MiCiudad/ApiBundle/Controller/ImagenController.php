@@ -124,7 +124,7 @@ class ImagenController extends Controller
 	public function solicitudFotoAction($solicitudId, $origen, $ancho, $alto, $autoRotar){
 	
 		$origen = base64_decode($origen);
-		$destino = substr("00000000" . $solicitudId, -8) . "_FotoUsuario_" . substr("00000000" . $ancho, -8) . "_" . substr("00000000" . $alto, -8) . ".jpg";
+		$destino = substr("00000000" . $solicitudId, -8) . "_FotoUsuario_" . substr("00000000" . $ancho, -8) . "_" . substr("00000000" . $alto, -8) . "_" . $autoRotar . ".jpg";
 		
 		$origen = $this->container->getParameter('directorio.uploads') . $origen;
 		$destino = $this->container->getParameter('directorio.uploads.cache') . "solicitud/" . $destino;
