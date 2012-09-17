@@ -305,58 +305,31 @@ class DefaultController extends Controller
    		$this->container->get('stof_doctrine_extensions.listener.translatable')->setTranslatableLocale($this->getRequest()->getPreferredLanguage());
    		
    		$request = $this->getRequest();
-   		
-   		$errors = null;
-   		if ($request->query->has("zona") == false){
-   			$errors = "zona es un parametro requerido";
-   		} else {
-   			$zona = $request->query->get("zona");
-   			
-   			if (preg_match("[\d]", $zona) == false || ((int)$zona < -10) || ((int)$zona > 13)){
-   				$errors = "zona debe ser un entero entre -10 y +13";
-   			}
-   		} 
-   		
-   		if ($errors == null){    		
-	   		$now = new \DateTime();
-	   		$zonaServer =($now->getTimezone()->getOffset($now) / 60 / 60);
-	   			   		
-	   		$zonaDispositivo = $request->query->get("zona");
-	   		
-	   		$diferencia = $zonaDispositivo - $zonaServer;
-	   		
-	   		$em = $this->getDoctrine()->getManager();
-	   		
-	   		$qb = $em->createQueryBuilder();
-	   		
-	   		$qb->select('ts')
-	   			->from('ModeloBundle:TipoSolicitud', 'ts')
-	   			->orderBy('ts.fechaUltimaActualizacion', 'DESC')
-				->setFirstResult(0)
-	   			->setMaxResults(1);
-	   		
-	   		$query = $qb->getQuery();
-	
-	   		$tipoSolicitud = $query->getSingleResult();
-	   		
-	   		$fecha = $tipoSolicitud->getFechaUltimaActualizacion();
-	   		
-	   		$fecha->modify($diferencia . ' hours');
-	   			
-	   		$result = array (
-	   							"fecha" => $fecha->format('Y-m-d H:i:s')
-	   						);
-	   		
-	   		$serializer = $this->container->get('serializer');
-	   		$report = $serializer->serialize($result, 'json');
-	   		
-	   		return new Response($report);
-   		} else {
-   			$serializer = $this->container->get('serializer');
-   			$report = $serializer->serialize($errors, 'json');
 
-   			return new Response($report, 502);
-   		}
+   		$em = $this->getDoctrine()->getManager();
+	   		
+	   	$qb = $em->createQueryBuilder();
+	   		
+	   	$qb->select('ts')
+	   		->from('ModeloBundle:TipoSolicitud', 'ts')
+	   		->orderBy('ts.fechaUltimaActualizacion', 'DESC')
+			->setFirstResult(0)
+	   		->setMaxResults(1);
+	   		
+	   	$query = $qb->getQuery();
+
+	   	$tipoSolicitud = $query->getSingleResult();
+	   		
+	   	$fecha = $tipoSolicitud->getFechaUltimaActualizacion();
+	   			
+	   	$result = array (
+	   						"fecha" => $fecha->format('Y-m-d H:i:s')
+	   					);
+	   		
+	   	$serializer = $this->container->get('serializer');
+	   	$report = $serializer->serialize($result, 'json');
+	   		
+	   	return new Response($report);
    	}
    	
    	private function validarVacios($arrayKeys){
