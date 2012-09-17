@@ -384,7 +384,7 @@ class DefaultController extends Controller
    	{
    		$this->container->get('stof_doctrine_extensions.listener.translatable')->setTranslatableLocale($this->getRequest()->getPreferredLanguage());
    		
-		$errors = $this->validarVacios(array ('tipoSolicitudId', 'descripcion', 'direccion', 'direccionValidada', 'dispositivoId', 'idioma'));
+		$errors = $this->validarVacios(array ('tipoSolicitudId', /*'descripcion',*/ 'direccion', 'direccionValidada', 'dispositivoId', 'idioma'));
 		$errors_datosPersonales = array();
 				
    		$em = $this->getDoctrine()->getManager();
