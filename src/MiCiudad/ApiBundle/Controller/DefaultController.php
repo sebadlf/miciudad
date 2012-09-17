@@ -844,12 +844,12 @@ class DefaultController extends Controller
    		$result = "";
    		$foto = $solicitud->getFoto();
    		 
-   		if (empty($icono) == false){
+   		if (empty($foto) == false){
    			$uri = $solicitud->getId();
-   			$uri .= "/" . base64_encode($tipoSolicitud->getIcono());
+   			$uri .= "/" . base64_encode($foto);
    			$uri .= "/" . $ancho;
    			$uri .= "/" . $alto;
-   			$uri .= "/" . $autoRotar;
+   			$uri .= "/" . (($autoRotar == true) ?  1 : 0);
    	
    			$request = $this->getRequest();
    			$scheme = $request->getScheme();
