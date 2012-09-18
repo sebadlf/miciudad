@@ -781,11 +781,14 @@ class DefaultController extends Controller
 
 		$solicitudes = array();
    		if ($tipo == "mias"){
-   			$solicitudes = $repository->findMias($dispositivoId);
+   			$cantidad = $this->container->getParameter("solicitud.cantidadMostradaPorPagina.mias");
+   			$solicitudes = $repository->findMias($dispositivoId, $cantidad);
    		} else if ($tipo == "cercanas"){
-   			$solicitudes = $repository->findCercanas($latitud, $longitud);
+   			$cantidad = $this->container->getParameter("solicitud.cantidadMostradaPorPagina.cercanas");
+   			$solicitudes = $repository->findCercanas($latitud, $longitud, $cantidad);
    		} else if ($tipo == "ultimas"){
-			$solicitudes = $repository->findUltimas();   			
+   			$cantidad = $this->container->getParameter("solicitud.cantidadMostradaPorPagina.ultimas");
+			$solicitudes = $repository->findUltimas($cantidad);   			
    		}
 
    		$report = array();

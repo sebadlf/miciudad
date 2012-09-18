@@ -14,13 +14,13 @@ use Doctrine\ORM\EntityRepository;
  */
 class SolicitudRepository extends EntityRepository
 {
-	private function inicializarQueryBuilder(){
+	private function inicializarQueryBuilder($cantidad){
 		$em = $this->getEntityManager();
 		
 		$qb = $em->createQueryBuilder();
 		
 		$qb->setFirstResult(0);
-		$qb->setMaxResults(30);
+		$qb->setMaxResults($cantidad);
 
 		return $qb;
 	}
@@ -34,9 +34,9 @@ class SolicitudRepository extends EntityRepository
 	}
 	
 	
-	public function findMias($dispositivoId){
-		
-		$qb = $this->inicializarQueryBuilder();
+	public function findMias($dispositivoId, $cantidad){
+
+		$qb = $this->inicializarQueryBuilder($cantidad);
 		
 		$qb->select('s')
 			->from('ModeloBundle:Solicitud', 's')
@@ -49,9 +49,9 @@ class SolicitudRepository extends EntityRepository
 		return $solicitudes;
 	}
 	
-	public function findCercanas($latitud, $longitud){
+	public function findCercanas($latitud, $longitud, $cantidad){
 	
-		$qb = $this->inicializarQueryBuilder();
+		$qb = $this->inicializarQueryBuilder($cantidad);
 	
 		$qb	->select('s as solicitud', 
 				'sqrt((s.latitud - :latitudActual) * (s.latitud - :latitudActual) + (s.longitud - :longitudActual) * (s.longitud - :longitudActual)) distancia')
@@ -69,9 +69,9 @@ class SolicitudRepository extends EntityRepository
 		return $solicitudes;
 	}
 	
-	public function findUltimas(){
+	public function findUltimas($cantidad){
 	
-		$qb = $this->inicializarQueryBuilder();
+		$qb = $this->inicializarQueryBuilder($cantidad);
 	
 		$qb->select('s')
 			->from('ModeloBundle:Solicitud', 's')

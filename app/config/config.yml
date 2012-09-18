@@ -18,7 +18,9 @@ parameters:
     solicitud.foto.altoMaximo: 600
     solicitud.foto.calidad: 90
     
-    solicitud.cantidadMostrada: 20 #Cantidad de solicitudes devueltas por la api
+    solicitud.cantidadMostradaPorPagina.mias: 30 
+    solicitud.cantidadMostradaPorPagina.ultimas: 10  
+    solicitud.cantidadMostradaPorPagina.cercanas: 10
     
     localizacion.codigoMoneda: $
     localizacion.pais: argentina
